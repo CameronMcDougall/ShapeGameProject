@@ -30,11 +30,11 @@ Passive abilities:
 
 **The Cylinder**\
 Active abilities:
-	*	Can roll forward backwards only
-	*	Can pivot left right
-	*	Boost ability possible after charging\
+	-	Can roll forward backwards only
+	-	Can pivot left right
+	-	Boost ability possible after charging\
 Passive abilities:
-	*	Moveable
+	-	Moveable
 
 ## Level Outlining
 Since this game contains various characters with different abilities, the characters themselves will be used as both a form of “leveling” as well as a reward for the player. The first level of the game will be used a tutorial to basic mechanics of the game, with the player starting off with the Sphere. The player will use the Sphere to maneuver through a basic scene, being taught about the jumping ability, the buoyancy of the sphere in water, and shown interactable objects. All of these things will be taught to the player with as minimal text as possible. The goal is to have the player learn by playing, rather than by reading. 
