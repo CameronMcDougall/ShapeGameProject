@@ -15,16 +15,16 @@ The Cube
 	Active abilities:
 -	Light/heavy mode
 -	In light mode:
-*	Can move forward/backwards, left/right in a gliding fashion
+	*	Can move forward/backwards, left/right in a gliding fashion
 	Passive abilities:
 -	In heavy mode:
-*	Immoveable
-*	Plummets straight down unless something stops it’s fall
-*	If plummets into breakable, breaks that object
+	*	Immoveable
+	*	Plummets straight down unless something stops it’s fall
+	*	If plummets into breakable, breaks that object
 -	In light mode:
-*	Slow fall (glides)
-*	Can be boosted by air from vents
-*	Automatically returns to heavy mode upon collision
+	*	Slow fall (glides)
+	*	Can be boosted by air from vents
+	*	Automatically returns to heavy mode upon collision
 The Cylinder
 	Active abilities:
 -	Can roll forward backwards only
