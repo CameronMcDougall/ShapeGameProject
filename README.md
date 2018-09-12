@@ -5,14 +5,15 @@ Shapes is a puzzle-platformer that focuses on player character morphing. Unlike 
 ## Characters:
 There are three main characters which the player can choose from. These are the Sphere, the Cube, and the Cylinder. More characters have been brainstormed but are yet to be finalized. Their passive and active abilities are as follows:
 
-The Sphere\
+**The Sphere**\
 Active abilities:
 -	full forwards/backwards, left/right movement
 -	Jump ability\
 Passive abilities:
 -	Can float
 -	Is moveable (objects which hit it, move it)\
-The Cube\
+
+**The Cube**\
 Active abilities:
 -	Light/heavy mode
 	-	In light mode:
@@ -25,8 +26,9 @@ Passive abilities:
 	-	In light mode:
 		*	Slow fall (glides)
 		*	Can be boosted by air from vents
-		*	Automatically returns to heavy mode upon collision
-The Cylinder\
+		*	Automatically returns to heavy mode upon collision\
+
+**The Cylinder**\
 Active abilities:
 	-	Can roll forward backwards only
 	-	Can pivot left right
