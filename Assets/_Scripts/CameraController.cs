@@ -55,11 +55,11 @@ public class CameraController : MonoBehaviour {
 	void Update () {
 		heading += Input.GetAxis ("Mouse X") * mouseSensitivityX;
 		tilt += Input.GetAxis ("Mouse Y") * mouseSensitivityY;
-
-		if (tilt < -30)
-			tilt = -30;
-		if (tilt > 60)
-			tilt = 60;
+        //was -30 before
+		if (tilt < 0f)
+			tilt = 0f;
+		if (tilt > 60f)
+			tilt = 60f;
 
 		transform.rotation = Quaternion.Euler (tilt, heading, 0f);
 
