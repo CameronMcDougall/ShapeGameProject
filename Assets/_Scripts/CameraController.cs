@@ -53,15 +53,18 @@ public class CameraController : MonoBehaviour {
 	}
 		
 	void Update () {
-		heading += Input.GetAxis ("Mouse X") * mouseSensitivityX;
-		tilt += Input.GetAxis ("Mouse Y") * mouseSensitivityY;
+        //heading += Input.GetAxis ("Mouse X") * Time.deltaTime * mouseSensitivityX;
+        //tilt -= Input.GetAxis ("Mouse Y") * Time.deltaTime * mouseSensitivityY;
         //was -30 before
-		if (tilt < 0f)
+        /*if (tilt < 0f)
 			tilt = 0f;
 		if (tilt > 60f)
-			tilt = 60f;
+			tilt = 60f;*/
+        float x = Input.GetAxis("Mouse X");
+        float y = Input.GetAxis("Mouse Y");
 
-		transform.rotation = Quaternion.Euler (tilt, heading, 0f);
+        transform.rotation *= Quaternion.Euler(new Vector3(-y * mouseSensitivityY, x * mouseSensitivityX));
+        transform.Rotate(0, 0, -transform.eulerAngles.z);
 
 		transform.position = player.transform.position - transform.forward * camDist;
 	}
