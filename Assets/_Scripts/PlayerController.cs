@@ -98,7 +98,7 @@ public class PlayerController : MonoBehaviour {
 	void movementLogic(){
 		float fwdInput;
 		float sideInput;
-		if (mor == 3) {
+		if (mor == 2) {
 			fwdInput = Input.GetAxis ("Vertical");
 			sideInput = 0f;
 			transform.RotateAround (playerPointer.transform.position, playerPointer.transform.up, Input.GetAxis ("Horizontal"));
@@ -115,7 +115,7 @@ public class PlayerController : MonoBehaviour {
 
 	void actionLogic(){
 		// Cylinder movement input action
-		if(mor==3){
+		if(mor==2){
 			if ((Input.GetAxis ("Action") > 0) && grounded && charge < 50) {
 				charge = charge + 1;
 				if (!csound.isPlaying) {
@@ -135,7 +135,7 @@ public class PlayerController : MonoBehaviour {
 				rb.AddForce(actionCl);
 				charge = 0;
 			}
-		}else if(mor==2){
+		}else if(mor==3){
 			Vector3 down = new Vector3 (0.0f, -1f, 0.0f);
 			if (shrunk) {
 				if (grounded) {
@@ -195,49 +195,27 @@ public class PlayerController : MonoBehaviour {
 		//currentCollisions = new List<GameObject>();
 
 		//Morphing activators/deactivators
-		//Sphere to box
+        // LHansen - Changed cylinder key to 2 and cube to 3. 27/09
+		//Sphere to Cylinder
 			if (Input.GetKeyDown(KeyCode.Alpha2) && mor==1) {
 				exp.Play ();
-				GetComponent<BoxCollider>().enabled = true;
+				GetComponent<MeshCollider>().enabled = true;
 				GetComponent<SphereCollider>().enabled = false;
-				GetComponent<MeshFilter>().mesh = cube;
+				GetComponent<MeshFilter>().mesh = cylinder;
+
 				mor = 2;
-				}
-		//Sphere to Cylinder
-			if (Input.GetKeyDown(KeyCode.Alpha3) && mor==1) {
-				exp.Play ();
-				GetComponent<MeshCollider>().enabled = true;
-				GetComponent<SphereCollider>().enabled = false;
-				GetComponent<MeshFilter>().mesh = cylinder;
-
-				mor = 3;
 			}
-		//Box to Sphere
-			if (Input.GetKeyDown(KeyCode.Alpha1) && mor==2) {
-			if (shrunk) {
-				shrink (false);
-			}
-				exp.Play ();
-				GetComponent<SphereCollider>().enabled = true;
-				GetComponent<BoxCollider>().enabled = false;
-				GetComponent<MeshFilter>().mesh = sphere;
-
-				mor = 1;
-			}
-		//Box to Cylinder
-			if (Input.GetKeyDown(KeyCode.Alpha3) && mor==2) {
-			if (shrunk) {
-				shrink (false);
-			}
-				exp.Play ();
-				GetComponent<MeshCollider>().enabled = true;
-				GetComponent<BoxCollider>().enabled = false;
-				GetComponent<MeshFilter>().mesh = cylinder;
-
-				mor = 3;
-			}
+        //Sphere to box
+            if (Input.GetKeyDown(KeyCode.Alpha3) && mor == 1)
+            {
+                exp.Play();
+                GetComponent<BoxCollider>().enabled = true;
+                GetComponent<SphereCollider>().enabled = false;
+                GetComponent<MeshFilter>().mesh = cube;
+                mor = 3;
+            }
 		//Cylinder to Sphere
-			if (Input.GetKeyDown(KeyCode.Alpha1) && mor==3) {
+			if (Input.GetKeyDown(KeyCode.Alpha1) && mor==2) {
 				
 				exp.Play ();
 				GetComponent<SphereCollider>().enabled = true;
@@ -247,14 +225,42 @@ public class PlayerController : MonoBehaviour {
 				mor = 1;
 			}
 		//Cylinder to Box
-			if (Input.GetKeyDown(KeyCode.Alpha2) && mor==3) {
+			if (Input.GetKeyDown(KeyCode.Alpha3) && mor==2) {
 				exp.Play ();
 				GetComponent<BoxCollider>().enabled = true;
 				GetComponent<MeshCollider>().enabled = false;
 				GetComponent<MeshFilter>().mesh = cube;
 
-				mor = 2;
+				mor = 3;
 			}
+        //Box to Sphere
+            if (Input.GetKeyDown(KeyCode.Alpha1) && mor == 3)
+            {
+                if (shrunk)
+                {
+                    shrink(false);
+                }
+                exp.Play();
+                GetComponent<SphereCollider>().enabled = true;
+                GetComponent<BoxCollider>().enabled = false;
+                GetComponent<MeshFilter>().mesh = sphere;
+
+                mor = 1;
+            }
+        //Box to Cylinder
+            if (Input.GetKeyDown(KeyCode.Alpha2) && mor == 3)
+            {
+                if (shrunk)
+                {
+                    shrink(false);
+                }
+                exp.Play();
+                GetComponent<MeshCollider>().enabled = true;
+                GetComponent<BoxCollider>().enabled = false;
+                GetComponent<MeshFilter>().mesh = cylinder;
+
+                mor = 2;
+            }
 	}
 
 	Vector3 getLowestVertex() {
