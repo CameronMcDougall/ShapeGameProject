@@ -186,7 +186,7 @@ public class PlayerController : MonoBehaviour {
 				rb.useGravity = true;
 				shrunk = false;
 			}
-		}
+        }
 	}
 
 	void updateShape() {
@@ -305,6 +305,7 @@ public class PlayerController : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other) {
 		playerInBoundsCheck (other);
+        checkpointCheck(other);
 	}
 
 	void playerInBoundsCheck (Collider other) {
@@ -315,6 +316,13 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
+    void checkpointCheck(Collider other) {
+        if (other.CompareTag("Respawn")) {
+            other.GetComponent<MeshRenderer>().enabled = false;
+            this.spawn.transform.position = other.gameObject.transform.position;
+            Debug.Log("potato");
+        }
+    }
 	//void OnCollisionEnter(Collision collision){
 		//if(collision.gameObject.CompareTag ("Ground")) {
 			//grounded = true;
