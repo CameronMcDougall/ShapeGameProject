@@ -28,7 +28,7 @@ public class StartMenuManager : MenuManager {
     }
     void onStart()
     {
-        SceneManager.LoadScene("Proto_1");
+        SceneManager.LoadScene("Level_1");
     }
     void onLoad()
     {
