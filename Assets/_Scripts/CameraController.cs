@@ -27,8 +27,12 @@ public class CameraController : MonoBehaviour {
 	private float heading = 0;
 	private float tilt = 0;
 
+    [SerializeField]
 	public float mouseSensitivityX;
+    [SerializeField]
 	public float mouseSensitivityY;
+    [SerializeField]
+    public float zoomSensitivity;
 
 	private Vector3 offset;
 	private float camDist = 0;
@@ -53,17 +57,27 @@ public class CameraController : MonoBehaviour {
 	}
 		
 	void Update () {
-        //heading += Input.GetAxis ("Mouse X") * Time.deltaTime * mouseSensitivityX;
-        //tilt -= Input.GetAxis ("Mouse Y") * Time.deltaTime * mouseSensitivityY;
-        //was -30 before
-        /*if (tilt < 0f)
-			tilt = 0f;
-		if (tilt > 60f)
-			tilt = 60f;*/
-        float x = Input.GetAxis("Mouse X");
-        float y = Input.GetAxis("Mouse Y");
+        float x = Input.GetAxis("Mouse X") * mouseSensitivityX;
+        float y = Input.GetAxis("Mouse Y") * mouseSensitivityY;
+        
+        if (invert)
+        {
+            y = -y;
+        }
 
-        transform.rotation *= Quaternion.Euler(new Vector3(-y * mouseSensitivityY, x * mouseSensitivityX));
+        float distance = 3f;
+        float distanceOffset = 0f; 
+        var delta = transform.position - (cameraPointer.transform.position);
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, delta, out hit, distance + 0.5f)) {
+            distanceOffset = distance - hit.distance + 0.8f;
+            distanceOffset = Mathf.Clamp(distanceOffset, 0, distance);
+        }
+
+        distance -= Input.GetAxis("ScrollWheel") * zoomSensitivity;
+        Mathf.Clamp(distance, 1, 6);
+
+        transform.rotation *= Quaternion.Euler(new Vector3(-y, x));
         transform.Rotate(0, 0, -transform.eulerAngles.z);
 
 		transform.position = player.transform.position - transform.forward * camDist;
