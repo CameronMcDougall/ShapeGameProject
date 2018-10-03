@@ -1,6 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+
 
 public class PlayerController : MonoBehaviour {
 	/* 
@@ -305,10 +309,28 @@ public class PlayerController : MonoBehaviour {
 
     void checkpointCheck(Collider other) {
         if (other.CompareTag("Respawn")) {
+            //collided with checkpoint
             other.GetComponent<MeshRenderer>().enabled = false;
             this.spawn.transform.position = other.gameObject.transform.position;
-            Debug.Log("potato");
+
+            saveGame();
         }
+    }
+
+    void saveGame() {
+        string curLevel = SceneManager.GetActiveScene().name;
+        string checkpointNAme = spawn.name;
+
+        string destination = Application.persistentDataPath + "/autosave.dat";
+        FileStream file;
+
+        if (File.Exists(destination)) file = File.OpenWrite(destination);
+        else file = File.Create(destination);
+
+        GameData data = new GameData(curLevel, checkpointNAme);
+        BinaryFormatter bf = new BinaryFormatter();
+        bf.Serialize(file, data);
+        file.Close();
     }
 	//void OnCollisionEnter(Collision collision){
 		//if(collision.gameObject.CompareTag ("Ground")) {
