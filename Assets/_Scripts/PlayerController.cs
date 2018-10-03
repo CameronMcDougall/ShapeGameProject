@@ -9,6 +9,14 @@ public class PlayerController : MonoBehaviour {
 	 * 29/07/18
 	 */
 
+    /*
+     * Modified and optimized by Kristian Hansen (hansenkris@myvuw.ac.nz)
+     * as of 03/10/18
+     */
+
+    // representation of current shape. better than a single arbitrary integer
+    protected enum ShapeVar { SPHERE, CYLINDER, CUBE, NONE };
+
 	private Rigidbody rb;
 
 	// min and max sides for player object
@@ -55,7 +63,7 @@ public class PlayerController : MonoBehaviour {
 	private bool shrunk = false;
 
 	// tracks morph state
-	public float mor;
+	protected ShapeVar mor;
 
 	public Mesh sphere;
 	public Mesh cube;
@@ -74,7 +82,7 @@ public class PlayerController : MonoBehaviour {
 
 	void Start () {
 		rb = GetComponent<Rigidbody> ();
-		mor = 1;
+		mor = ShapeVar.SPHERE;
 	}
 
 	void Update () {
@@ -98,7 +106,7 @@ public class PlayerController : MonoBehaviour {
 	void movementLogic(){
 		float fwdInput;
 		float sideInput;
-		if (mor == 2) {
+		if (mor == ShapeVar.CYLINDER) {
 			fwdInput = Input.GetAxis ("Vertical");
 			sideInput = 0f;
 			transform.RotateAround (playerPointer.transform.position, playerPointer.transform.up, Input.GetAxis ("Horizontal"));
@@ -115,7 +123,7 @@ public class PlayerController : MonoBehaviour {
 
 	void actionLogic(){
 		// Cylinder movement input action
-		if(mor==2){
+		if(mor==ShapeVar.CYLINDER){
 			if ((Input.GetAxis ("Action") > 0) && grounded && charge < 50) {
 				charge = charge + 1;
 				if (!csound.isPlaying) {
@@ -135,7 +143,7 @@ public class PlayerController : MonoBehaviour {
 				rb.AddForce(actionCl);
 				charge = 0;
 			}
-		}else if(mor==3){
+		}else if(mor==ShapeVar.CUBE){
 			Vector3 down = new Vector3 (0.0f, -1f, 0.0f);
 			if (shrunk) {
 				if (grounded) {
@@ -192,49 +200,86 @@ public class PlayerController : MonoBehaviour {
 	void updateShape() {
 		//Explosion effect for morphing
 		var exp = GetComponent<ParticleSystem> ();
-		//currentCollisions = new List<GameObject>();
+        //currentCollisions = new List<GameObject>();
 
+        ShapeVar next = ShapeVar.NONE;
+        if (Input.GetKeyDown(KeyCode.Alpha1) && mor != ShapeVar.SPHERE)
+            next = ShapeVar.SPHERE;
+        if (Input.GetKeyDown(KeyCode.Alpha2) && mor != ShapeVar.CYLINDER)
+            next = ShapeVar.CYLINDER;
+        if (Input.GetKeyDown(KeyCode.Alpha3) && mor != ShapeVar.CUBE)
+            next = ShapeVar.CUBE;
+
+        if (next != ShapeVar.NONE)
+        {
+            exp.Play();
+            if (mor == ShapeVar.SPHERE)
+                GetComponent<SphereCollider>().enabled = false;
+            else if (mor == ShapeVar.CYLINDER)
+                GetComponent<MeshCollider>().enabled = false;
+            else if (mor == ShapeVar.CUBE)
+                GetComponent<BoxCollider>().enabled = false;
+            
+            if (next == ShapeVar.SPHERE)
+            {
+                GetComponent<SphereCollider>().enabled = true;
+                GetComponent<MeshFilter>().mesh = sphere;
+                mor = ShapeVar.SPHERE;
+            }
+            else if (next == ShapeVar.CYLINDER)
+            {
+                GetComponent<MeshCollider>().enabled = true;
+                GetComponent<MeshFilter>().mesh = cylinder;
+                mor = ShapeVar.CYLINDER;
+            }
+            else if (next == ShapeVar.CUBE)
+            {
+                GetComponent<BoxCollider>().enabled = true;
+                GetComponent<MeshFilter>().mesh = cube;
+                mor = ShapeVar.CUBE;
+            }
+        }
 		//Morphing activators/deactivators
         // LHansen - Changed cylinder key to 2 and cube to 3. 27/09
-		//Sphere to Cylinder
-			if (Input.GetKeyDown(KeyCode.Alpha2) && mor==1) {
+		/*/Sphere to Cylinder
+			if (Input.GetKeyDown(KeyCode.Alpha2) && mor==ShapeVar.SPHERE) {
 				exp.Play ();
 				GetComponent<MeshCollider>().enabled = true;
 				GetComponent<SphereCollider>().enabled = false;
 				GetComponent<MeshFilter>().mesh = cylinder;
 
-				mor = 2;
+				mor = ShapeVar.CYLINDER;
 			}
         //Sphere to box
-            if (Input.GetKeyDown(KeyCode.Alpha3) && mor == 1)
+            if (Input.GetKeyDown(KeyCode.Alpha3) && mor == ShapeVar.SPHERE)
             {
                 exp.Play();
                 GetComponent<BoxCollider>().enabled = true;
                 GetComponent<SphereCollider>().enabled = false;
                 GetComponent<MeshFilter>().mesh = cube;
-                mor = 3;
+                mor = ShapeVar.CUBE;
             }
 		//Cylinder to Sphere
-			if (Input.GetKeyDown(KeyCode.Alpha1) && mor==2) {
+			if (Input.GetKeyDown(KeyCode.Alpha1) && mor==ShapeVar.CYLINDER) {
 				
 				exp.Play ();
 				GetComponent<SphereCollider>().enabled = true;
 				GetComponent<MeshCollider>().enabled = false;
 				GetComponent<MeshFilter>().mesh = sphere;
 
-				mor = 1;
+				mor = ShapeVar.SPHERE;
 			}
 		//Cylinder to Box
-			if (Input.GetKeyDown(KeyCode.Alpha3) && mor==2) {
+			if (Input.GetKeyDown(KeyCode.Alpha3) && mor==ShapeVar.CYLINDER) {
 				exp.Play ();
 				GetComponent<BoxCollider>().enabled = true;
 				GetComponent<MeshCollider>().enabled = false;
 				GetComponent<MeshFilter>().mesh = cube;
 
-				mor = 3;
+				mor = ShapeVar.CUBE;
 			}
         //Box to Sphere
-            if (Input.GetKeyDown(KeyCode.Alpha1) && mor == 3)
+            if (Input.GetKeyDown(KeyCode.Alpha1) && mor == ShapeVar.CUBE)
             {
                 if (shrunk)
                 {
@@ -248,7 +293,7 @@ public class PlayerController : MonoBehaviour {
                 mor = 1;
             }
         //Box to Cylinder
-            if (Input.GetKeyDown(KeyCode.Alpha2) && mor == 3)
+            if (Input.GetKeyDown(KeyCode.Alpha2) && mor == ShapeVar.CUBE)
             {
                 if (shrunk)
                 {
@@ -260,7 +305,7 @@ public class PlayerController : MonoBehaviour {
                 GetComponent<MeshFilter>().mesh = cylinder;
 
                 mor = 2;
-            }
+            }*/
 	}
 
 	Vector3 getLowestVertex() {
@@ -268,9 +313,9 @@ public class PlayerController : MonoBehaviour {
 		Mesh m = player.GetComponent<MeshFilter> ().mesh;
 		Vector3[] vecs = m.vertices;
 		int inc = 12;
-		if (mor == 2)
+		if (mor == ShapeVar.CYLINDER)
 			inc = 1;
-		if (mor == 3)
+		if (mor == ShapeVar.CUBE)
 			inc = 3;
 		if (vexCycler > inc)
 			vexCycler = 0;

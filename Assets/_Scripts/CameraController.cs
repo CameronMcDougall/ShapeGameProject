@@ -65,7 +65,7 @@ public class CameraController : MonoBehaviour {
             y = -y;
         }
 
-        float distance = 3f;
+       /* float distance = 3f;
         float distanceOffset = 0f; 
         var delta = transform.position - (cameraPointer.transform.position);
         RaycastHit hit;
@@ -75,7 +75,7 @@ public class CameraController : MonoBehaviour {
         }
 
         distance -= Input.GetAxis("ScrollWheel") * zoomSensitivity;
-        Mathf.Clamp(distance, 1, 6);
+        Mathf.Clamp(distance, 1, 6);*/
 
         transform.rotation *= Quaternion.Euler(new Vector3(-y, x));
         transform.Rotate(0, 0, -transform.eulerAngles.z);
