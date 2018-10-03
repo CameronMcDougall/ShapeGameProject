@@ -32,6 +32,9 @@ public class PlayerController : MonoBehaviour {
 
 	public GameObject player;
 
+    [SerializeField]
+    public float breakingMomentum;
+
 	public Camera cam;
 
 	// player spawn point
@@ -239,73 +242,6 @@ public class PlayerController : MonoBehaviour {
                 mor = ShapeVar.CUBE;
             }
         }
-		//Morphing activators/deactivators
-        // LHansen - Changed cylinder key to 2 and cube to 3. 27/09
-		/*/Sphere to Cylinder
-			if (Input.GetKeyDown(KeyCode.Alpha2) && mor==ShapeVar.SPHERE) {
-				exp.Play ();
-				GetComponent<MeshCollider>().enabled = true;
-				GetComponent<SphereCollider>().enabled = false;
-				GetComponent<MeshFilter>().mesh = cylinder;
-
-				mor = ShapeVar.CYLINDER;
-			}
-        //Sphere to box
-            if (Input.GetKeyDown(KeyCode.Alpha3) && mor == ShapeVar.SPHERE)
-            {
-                exp.Play();
-                GetComponent<BoxCollider>().enabled = true;
-                GetComponent<SphereCollider>().enabled = false;
-                GetComponent<MeshFilter>().mesh = cube;
-                mor = ShapeVar.CUBE;
-            }
-		//Cylinder to Sphere
-			if (Input.GetKeyDown(KeyCode.Alpha1) && mor==ShapeVar.CYLINDER) {
-				
-				exp.Play ();
-				GetComponent<SphereCollider>().enabled = true;
-				GetComponent<MeshCollider>().enabled = false;
-				GetComponent<MeshFilter>().mesh = sphere;
-
-				mor = ShapeVar.SPHERE;
-			}
-		//Cylinder to Box
-			if (Input.GetKeyDown(KeyCode.Alpha3) && mor==ShapeVar.CYLINDER) {
-				exp.Play ();
-				GetComponent<BoxCollider>().enabled = true;
-				GetComponent<MeshCollider>().enabled = false;
-				GetComponent<MeshFilter>().mesh = cube;
-
-				mor = ShapeVar.CUBE;
-			}
-        //Box to Sphere
-            if (Input.GetKeyDown(KeyCode.Alpha1) && mor == ShapeVar.CUBE)
-            {
-                if (shrunk)
-                {
-                    shrink(false);
-                }
-                exp.Play();
-                GetComponent<SphereCollider>().enabled = true;
-                GetComponent<BoxCollider>().enabled = false;
-                GetComponent<MeshFilter>().mesh = sphere;
-
-                mor = 1;
-            }
-        //Box to Cylinder
-            if (Input.GetKeyDown(KeyCode.Alpha2) && mor == ShapeVar.CUBE)
-            {
-                if (shrunk)
-                {
-                    shrink(false);
-                }
-                exp.Play();
-                GetComponent<MeshCollider>().enabled = true;
-                GetComponent<BoxCollider>().enabled = false;
-                GetComponent<MeshFilter>().mesh = cylinder;
-
-                mor = 2;
-            }*/
 	}
 
 	Vector3 getLowestVertex() {
@@ -320,7 +256,7 @@ public class PlayerController : MonoBehaviour {
 		if (vexCycler > inc)
 			vexCycler = 0;
 		for(int i = vexCycler; i < vecs.Length; i += inc) {
-			Debug.Log (i);
+			//Debug.Log (i);
 			Vector3 temp = player.transform.TransformVector (vecs[i]) + player.transform.position;
 
 			if (temp.y < lowest.y)
@@ -335,7 +271,7 @@ public class PlayerController : MonoBehaviour {
 		int layerMask = LayerMask.GetMask ("Default");
 		RaycastHit hit;
 		Ray ray = new Ray (lowest + new Vector3(0.0f, 0.01f, 0.0f), -playerPointer.transform.up);
-		Debug.Log (ray.origin.y);
+		//Debug.Log (ray.origin.y);
 		if(Physics.Raycast(ray, out hit, 0.09f, layerMask, QueryTriggerInteraction.Ignore)){
 			grounded = true;
 			if(hit.collider.CompareTag("Ground")){
@@ -380,8 +316,21 @@ public class PlayerController : MonoBehaviour {
 		//}
 	//}
 
-	void OnCollisionEnter (Collision col) {
-	}
+	void OnCollisionEnter (Collision col)
+    {        
+        if (mor == ShapeVar.CUBE && col.collider.CompareTag("Breakable"))
+        {
+            Debug.Log("Blep");
+            Vector3 momentum = rb.velocity * rb.mass; // p=mv
+            if (momentum.magnitude >= breakingMomentum)
+            {
+                var exp = GetComponent<ParticleSystem>();
+                Destroy(col.gameObject);
+                rb.velocity = new Vector3(0.0f, 0.0f, 0.0f);
+                rb.angularVelocity = new Vector3(0.0f, 0.0f, 0.0f);
+            }
+        }
+    }
 
 	void OnCollisionExit (Collision col) {
 	}
