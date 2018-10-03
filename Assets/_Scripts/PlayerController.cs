@@ -1,13 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class PlayerController : MonoBehaviour {
-	/* 
-	 * Player controller for Shape game; MDDN243/COMP313 course A2
-	 * Sean Kells; kellssean@myvuw.ac.nz
-	 * 29/07/18
-	 */
+public class PlayerController : MonoBehaviour
+{
+    /* 
+     * Player controller for Shape game; MDDN243/COMP313 course A2
+     * Sean Kells; kellssean@myvuw.ac.nz
+     * 29/07/18
+     */
 
     /*
      * Modified and optimized by Kristian Hansen (hansenkris@myvuw.ac.nz)
@@ -17,192 +19,243 @@ public class PlayerController : MonoBehaviour {
     // representation of current shape. better than a single arbitrary integer
     protected enum ShapeVar { SPHERE, CYLINDER, CUBE, NONE };
 
-	private Rigidbody rb;
+    private Rigidbody rb;
 
-	// min and max sides for player object
-	private int minSides;
-	private int maxSides;
+    // min and max sides for player object
+    private int minSides;
+    private int maxSides;
 
-	// player current sides
-	private int sides;
+    // player current sides
+    private int sides;
 
-	// camera reference for movement vectors
-	public GameObject playerPointer;
-	public GameObject cameraPointer;
+    // camera reference for movement vectors
+    public GameObject playerPointer;
+    public GameObject cameraPointer;
 
-	public GameObject player;
+    public GameObject player;
 
     [SerializeField]
     public float breakingMomentum;
 
-	public Camera cam;
+    public Camera cam;
 
-	// player spawn point
-	public GameObject spawn;
+    // player spawn point
+    public GameObject spawn;
 
-	// editor set fixed speed variable
-	public float speed;
+    // editor set fixed speed variable
+    public float speed;
 
-	//
-	public int vexRatio = 5;
+    //
+    public int vexRatio = 5;
 
-	// 
-	public float glideFallSpeed;
-	public float heavyFallSpeed;
+    // 
+    public float glideFallSpeed;
+    public float heavyFallSpeed;
 
-	// boost value
-	public float boost;
+    // boost value
+    public float boost;
 
-	// tracks total charge amount
-	private float charge = 0;
+    // tracks total charge amount
+    private float charge = 0;
 
-	private float shrinkDelay = 0;
+    private float shrinkDelay = 0;
 
     // Action value for editor
     public float ActionAmount;
 
-	// tracks if player is grounded
-	private bool grounded = true;
-	private bool shrunk = false;
+    // tracks if player is grounded
+    private bool grounded = true;
+    private bool shrunk = false;
 
-	// tracks morph state
-	protected ShapeVar mor;
+    // tracks morph state
+    protected ShapeVar mor;
 
-	public Mesh sphere;
-	public Mesh cube;
-	public Mesh cylinder;
+    public Mesh sphere;
+    public Mesh cube;
+    public Mesh cylinder;
 
-	public AudioSource jsound;
-	public AudioSource csound;
-	public AudioSource msound;
-	public AudioSource lsound;
+    public AudioSource jsound;
+    public AudioSource csound;
+    public AudioSource msound;
+    public AudioSource lsound;
 
-	private int vexCycler = 0;
+    // Slider to visually show charging cylinder.     public Slider chargeSlider;     public Image cs_FillImage;                           public Color cs_FullChargeColor = Color.green;       public Color cs_ZeroChargeColor = Color.red; 
 
-	List<GameObject> currentCollisions = new List<GameObject>();
-	
-	Vector3 movement = new Vector3 (0.0f, 0.0f, 0.0f);
+    private int vexCycler = 0;
 
-	void Start () {
-		rb = GetComponent<Rigidbody> ();
-		mor = ShapeVar.SPHERE;
-	}
+    List<GameObject> currentCollisions = new List<GameObject>();
 
-	void Update () {
-		float deltaT = Time.deltaTime;
-		shrinkDelay -= deltaT;
+    Vector3 movement = new Vector3(0.0f, 0.0f, 0.0f);
 
-		//Debug.Log (1 / 4);
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+        mor = ShapeVar.SPHERE;
+    }
 
-		rayCastGround(getLowestVertex());
-		
-		updateShape();
+    void Update()
+    {
+        float deltaT = Time.deltaTime;
+        shrinkDelay -= deltaT;
 
-		movementLogic();
+        //Debug.Log (1 / 4);
 
-		actionLogic();
+        rayCastGround(getLowestVertex());
 
-		//Debug.Log ("Grounded: " + grounded);
+        updateShape();
 
-	}
+        movementLogic();
 
-	void movementLogic(){
-		float fwdInput;
-		float sideInput;
-		if (mor == ShapeVar.CYLINDER) {
-			fwdInput = Input.GetAxis ("Vertical");
-			sideInput = 0f;
-			transform.RotateAround (playerPointer.transform.position, playerPointer.transform.up, Input.GetAxis ("Horizontal"));
-		} else {
-			fwdInput = Input.GetAxis ("Vertical");
-			sideInput = Input.GetAxis ("Horizontal");
-		}
-		Vector3 camForward2 = new Vector3(cam.transform.forward.x, 0.0f, cam.transform.forward.z) * fwdInput;
-		Vector3 camRight2 = new Vector3(cam.transform.right.x, 0.0f, cam.transform.right.z) * sideInput;
-		movement = camForward2 + camRight2;
+        actionLogic();
 
-		rb.AddForce (movement * speed);
-	}
+        //Debug.Log ("Grounded: " + grounded);
 
-	void actionLogic(){
-		// Cylinder movement input action
-		if(mor==ShapeVar.CYLINDER){
-			if ((Input.GetAxis ("Action") > 0) && grounded && charge < 50) {
-				charge = charge + 1;
-				if (!csound.isPlaying) {
-					csound.Play ();
-				}
-			}
-			if ((Input.GetAxis ("Action") > 0) && grounded && charge >= 50) {
-				charge = charge + 1;
-				if (!msound.isPlaying) {
-					msound.Play();
-				}
-			}
-			if ((Input.GetAxis("Action") == 0) && grounded && charge >= 50) {
-				msound.Stop();
-				lsound.Play();
-				Vector3 actionCl = (playerPointer.transform.forward * boost) + playerPointer.transform.up * 40;
-				rb.AddForce(actionCl);
-				charge = 0;
-			}
-		}else if(mor==ShapeVar.CUBE){
-			Vector3 down = new Vector3 (0.0f, -1f, 0.0f);
-			if (shrunk) {
-				if (grounded) {
-					shrink (false);
-				} else {
-					if (Input.GetAxis ("Action") > 0 && shrinkDelay <= 0) {
-						shrink (false);
-						shrinkDelay = 0.4f;
-						down = down * glideFallSpeed;
-					}
-				}
-			} else {
-				if (!grounded) {
-					if (Input.GetAxis ("Action") > 0 && shrinkDelay <= 0) {
-						shrink (true);
-						shrinkDelay = 0.4f;
-					} else {
-						down = down * heavyFallSpeed;
-					}
-				}
-			}
-			rb.AddForce (down);
-		}else{
-			Vector3 camUpward = new Vector3 (0.0f, 0.0f, 0.0f);
-			if(grounded & (Input.GetAxis ("Action") > 0)) {
-				camUpward = playerPointer.transform.up * (float)Input.GetAxis ("Action") * ActionAmount;
-				grounded = false;
+    }
 
-				if (!jsound.isPlaying) {
-					jsound.Play();
-				}
-			}
-			rb.AddForce (camUpward * speed);
-		}
-	}
-
-	void shrink (bool b) {
-		if (b) {
-			if (!shrunk) {
-				transform.localScale = transform.localScale + new Vector3 (-0.7f, -0.7f, -0.7f);
-				rb.useGravity = false;
-				shrunk = true;
-				rb.velocity = new Vector3(rb.velocity.x, 0.0f, rb.velocity.z);
-			}
-		} else {
-			if (shrunk) {
-				transform.localScale = transform.localScale + new Vector3 (0.7f, 0.7f, 0.7f);
-				rb.useGravity = true;
-				shrunk = false;
-			}
+    void movementLogic()
+    {
+        float fwdInput;
+        float sideInput;
+        if (mor == ShapeVar.CYLINDER)
+        {
+            fwdInput = Input.GetAxis("Vertical");
+            sideInput = 0f;
+            transform.RotateAround(playerPointer.transform.position, playerPointer.transform.up, Input.GetAxis("Horizontal"));
         }
-	}
+        else
+        {
+            fwdInput = Input.GetAxis("Vertical");
+            sideInput = Input.GetAxis("Horizontal");
+        }
+        Vector3 camForward2 = new Vector3(cam.transform.forward.x, 0.0f, cam.transform.forward.z) * fwdInput;
+        Vector3 camRight2 = new Vector3(cam.transform.right.x, 0.0f, cam.transform.right.z) * sideInput;
+        movement = camForward2 + camRight2;
 
-	void updateShape() {
-		//Explosion effect for morphing
-		var exp = GetComponent<ParticleSystem> ();
+        rb.AddForce(movement * speed);
+    }
+
+    void actionLogic()
+    {
+        // Cylinder movement input action
+        if (mor == ShapeVar.CYLINDER)
+        {
+            if ((Input.GetAxis("Action") > 0) && grounded && charge < 50)
+            {
+                charge = charge + 1;
+
+                // Increase slider value:
+                chargeSlider.value += 2;                 cs_FillImage.color = Color.Lerp(cs_ZeroChargeColor, cs_FullChargeColor, chargeSlider.value / 100);
+
+                if (!csound.isPlaying)
+                {
+                    csound.Play();
+                }
+            }
+            if ((Input.GetAxis("Action") > 0) && grounded && charge >= 50)
+            {
+                charge = charge + 1;
+
+                // Increase slider value:
+                if (chargeSlider.value < 99)                 {                     chargeSlider.value += 2;                     cs_FillImage.color = Color.Lerp(cs_ZeroChargeColor, cs_FullChargeColor, chargeSlider.value / 100);
+                    //Debug.Log("Charge slider value = " + chargeSlider.value);
+                }
+
+                if (!msound.isPlaying)
+                {
+                    msound.Play();
+                }
+            }
+            if ((Input.GetAxis("Action") == 0) && grounded && charge >= 50)
+            {
+                msound.Stop();
+                lsound.Play();
+                Vector3 actionCl = (playerPointer.transform.forward * boost) + playerPointer.transform.up * 40;
+                rb.AddForce(actionCl);
+                charge = 0;
+                // Reset slider value.
+                chargeSlider.value = 0;                 cs_FillImage.color = Color.Lerp(cs_ZeroChargeColor, cs_FullChargeColor, chargeSlider.value / 100);
+            }
+        }
+        else if (mor == ShapeVar.CUBE)
+        {
+            Vector3 down = new Vector3(0.0f, -1f, 0.0f);
+            if (shrunk)
+            {
+                if (grounded)
+                {
+                    shrink(false);
+                }
+                else
+                {
+                    if (Input.GetAxis("Action") > 0 && shrinkDelay <= 0)
+                    {
+                        shrink(false);
+                        shrinkDelay = 0.4f;
+                        down = down * glideFallSpeed;
+                    }
+                }
+            }
+            else
+            {
+                if (!grounded)
+                {
+                    if (Input.GetAxis("Action") > 0 && shrinkDelay <= 0)
+                    {
+                        shrink(true);
+                        shrinkDelay = 0.4f;
+                    }
+                    else
+                    {
+                        down = down * heavyFallSpeed;
+                    }
+                }
+            }
+            rb.AddForce(down);
+        }
+        else
+        {
+            Vector3 camUpward = new Vector3(0.0f, 0.0f, 0.0f);
+            if (grounded & (Input.GetAxis("Action") > 0))
+            {
+                camUpward = playerPointer.transform.up * (float)Input.GetAxis("Action") * ActionAmount;
+                grounded = false;
+
+                if (!jsound.isPlaying)
+                {
+                    jsound.Play();
+                }
+            }
+            rb.AddForce(camUpward * speed);
+        }
+    }
+
+    void shrink(bool b)
+    {
+        if (b)
+        {
+            if (!shrunk)
+            {
+                transform.localScale = transform.localScale + new Vector3(-0.7f, -0.7f, -0.7f);
+                rb.useGravity = false;
+                shrunk = true;
+                rb.velocity = new Vector3(rb.velocity.x, 0.0f, rb.velocity.z);
+            }
+        }
+        else
+        {
+            if (shrunk)
+            {
+                transform.localScale = transform.localScale + new Vector3(0.7f, 0.7f, 0.7f);
+                rb.useGravity = true;
+                shrunk = false;
+            }
+        }
+    }
+
+    void updateShape()
+    {
+        //Explosion effect for morphing
+        var exp = GetComponent<ParticleSystem>();
         //currentCollisions = new List<GameObject>();
 
         ShapeVar next = ShapeVar.NONE;
@@ -222,7 +275,7 @@ public class PlayerController : MonoBehaviour {
                 GetComponent<MeshCollider>().enabled = false;
             else if (mor == ShapeVar.CUBE)
                 GetComponent<BoxCollider>().enabled = false;
-            
+
             if (next == ShapeVar.SPHERE)
             {
                 GetComponent<SphereCollider>().enabled = true;
@@ -242,82 +295,97 @@ public class PlayerController : MonoBehaviour {
                 mor = ShapeVar.CUBE;
             }
         }
-	}
+    }
 
-	Vector3 getLowestVertex() {
-		Vector3 lowest = new Vector3(0f, Mathf.Infinity, 0f);
-		Mesh m = player.GetComponent<MeshFilter> ().mesh;
-		Vector3[] vecs = m.vertices;
-		int inc = 12;
-		if (mor == ShapeVar.CYLINDER)
-			inc = 1;
-		if (mor == ShapeVar.CUBE)
-			inc = 3;
-		if (vexCycler > inc)
-			vexCycler = 0;
-		for(int i = vexCycler; i < vecs.Length; i += inc) {
-			//Debug.Log (i);
-			Vector3 temp = player.transform.TransformVector (vecs[i]) + player.transform.position;
+    Vector3 getLowestVertex()
+    {
+        Vector3 lowest = new Vector3(0f, Mathf.Infinity, 0f);
+        Mesh m = player.GetComponent<MeshFilter>().mesh;
+        Vector3[] vecs = m.vertices;
+        int inc = 12;
+        if (mor == ShapeVar.CYLINDER)
+            inc = 1;
+        if (mor == ShapeVar.CUBE)
+            inc = 3;
+        if (vexCycler > inc)
+            vexCycler = 0;
+        for (int i = vexCycler; i < vecs.Length; i += inc)
+        {
+            //Debug.Log (i);
+            Vector3 temp = player.transform.TransformVector(vecs[i]) + player.transform.position;
 
-			if (temp.y < lowest.y)
-				lowest = temp;
-			
-		}
-		vexCycler ++;
-		return lowest;
-	}
+            if (temp.y < lowest.y)
+                lowest = temp;
 
-	void rayCastGround(Vector3 lowest) {
-		int layerMask = LayerMask.GetMask ("Default");
-		RaycastHit hit;
-		Ray ray = new Ray (lowest + new Vector3(0.0f, 0.01f, 0.0f), -playerPointer.transform.up);
-		//Debug.Log (ray.origin.y);
-		if(Physics.Raycast(ray, out hit, 0.09f, layerMask, QueryTriggerInteraction.Ignore)){
-			grounded = true;
-			if(hit.collider.CompareTag("Ground")){
-				Debug.DrawRay(ray.origin, ray.direction * 0.09f, Color.yellow, 3f);
-			} else {
-				Debug.DrawRay(ray.origin, ray.direction * 0.09f, Color.red, 3f);
-				grounded = false;
-			}
-		}else{
-			grounded = false;
-			Debug.DrawRay(ray.origin, ray.direction * 0.09f, Color.white, 3f);
-		}
-	}
+        }
+        vexCycler++;
+        return lowest;
+    }
+
+    void rayCastGround(Vector3 lowest)
+    {
+        int layerMask = LayerMask.GetMask("Default");
+        RaycastHit hit;
+        Ray ray = new Ray(lowest + new Vector3(0.0f, 0.01f, 0.0f), -playerPointer.transform.up);
+        //Debug.Log (ray.origin.y);
+        if (Physics.Raycast(ray, out hit, 0.09f, layerMask, QueryTriggerInteraction.Ignore))
+        {
+            grounded = true;
+            if (hit.collider.CompareTag("Ground"))
+            {
+                Debug.DrawRay(ray.origin, ray.direction * 0.09f, Color.yellow, 3f);
+            }
+            else
+            {
+                Debug.DrawRay(ray.origin, ray.direction * 0.09f, Color.red, 3f);
+                grounded = false;
+            }
+        }
+        else
+        {
+            grounded = false;
+            Debug.DrawRay(ray.origin, ray.direction * 0.09f, Color.white, 3f);
+        }
+    }
 
 
-	void LateUpdate () {
-	}
+    void LateUpdate()
+    {
+    }
 
-	void OnTriggerEnter(Collider other) {
-		playerInBoundsCheck (other);
+    void OnTriggerEnter(Collider other)
+    {
+        playerInBoundsCheck(other);
         checkpointCheck(other);
-	}
+    }
 
-	void playerInBoundsCheck (Collider other) {
-		if (other.CompareTag ("KillBox")) {
-			transform.position = spawn.transform.position;
-			rb.velocity = new Vector3 (0.0f, 0.0f, 0.0f);
-			rb.angularVelocity = new Vector3 (0.0f, 0.0f, 0.0f);
-		}
-	}
+    void playerInBoundsCheck(Collider other)
+    {
+        if (other.CompareTag("KillBox"))
+        {
+            transform.position = spawn.transform.position;
+            rb.velocity = new Vector3(0.0f, 0.0f, 0.0f);
+            rb.angularVelocity = new Vector3(0.0f, 0.0f, 0.0f);
+        }
+    }
 
-    void checkpointCheck(Collider other) {
-        if (other.CompareTag("Respawn")) {
+    void checkpointCheck(Collider other)
+    {
+        if (other.CompareTag("Respawn"))
+        {
             other.GetComponent<MeshRenderer>().enabled = false;
             this.spawn.transform.position = other.gameObject.transform.position;
             Debug.Log("potato");
         }
     }
-	//void OnCollisionEnter(Collision collision){
-		//if(collision.gameObject.CompareTag ("Ground")) {
-			//grounded = true;
-		//}
-	//}
+    //void OnCollisionEnter(Collision collision){
+    //if(collision.gameObject.CompareTag ("Ground")) {
+    //grounded = true;
+    //}
+    //}
 
-	void OnCollisionEnter (Collision col)
-    {        
+    void OnCollisionEnter(Collision col)
+    {
         if (mor == ShapeVar.CUBE && col.collider.CompareTag("Breakable"))
         {
             Debug.Log("Blep");
@@ -332,13 +400,11 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-	void OnCollisionExit (Collision col) {
-	}
+    void OnCollisionExit(Collision col)
+    {
+    }
 
 
 
 
 }
-
-
-
