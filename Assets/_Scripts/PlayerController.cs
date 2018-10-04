@@ -1,19 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-<<<<<<< HEAD
 using UnityEngine.SceneManagement;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-
-
-public class PlayerController : MonoBehaviour {
-	/* 
-	 * Player controller for Shape game; MDDN243/COMP313 course A2
-	 * Sean Kells; kellssean@myvuw.ac.nz
-	 * 29/07/18
-	 */
-=======
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
@@ -23,7 +13,7 @@ public class PlayerController : MonoBehaviour
      * Sean Kells; kellssean@myvuw.ac.nz
      * 29/07/18
      */
->>>>>>> 8a7ec8698e85c09fbc5c7c36d55171064b18f266
+
 
     /*
      * Modified and optimized by Kristian Hansen (hansenkris@myvuw.ac.nz)
@@ -95,6 +85,9 @@ public class PlayerController : MonoBehaviour
 
     // Slider to visually show charging cylinder.     public Slider chargeSlider;     public Image cs_FillImage;                           public Color cs_FullChargeColor = Color.green;       public Color cs_ZeroChargeColor = Color.red; 
 
+    // Displays the current attempt the player is on.
+    public Text attemptText;     private int attemptNo = 1;
+
     private int vexCycler = 0;
 
     List<GameObject> currentCollisions = new List<GameObject>();
@@ -105,6 +98,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         mor = ShapeVar.SPHERE;
+        // Set the text for the current attempt.         SetAttemptText();         // Set the slider to be invisible at the start (so it only shows for the cylinder)         chargeSlider.gameObject.SetActive(false);
     }
 
     void Update()
@@ -294,18 +288,21 @@ public class PlayerController : MonoBehaviour
             {
                 GetComponent<SphereCollider>().enabled = true;
                 GetComponent<MeshFilter>().mesh = sphere;
+                chargeSlider.gameObject.SetActive(false);
                 mor = ShapeVar.SPHERE;
             }
             else if (next == ShapeVar.CYLINDER)
             {
                 GetComponent<MeshCollider>().enabled = true;
                 GetComponent<MeshFilter>().mesh = cylinder;
+                chargeSlider.gameObject.SetActive(true);
                 mor = ShapeVar.CYLINDER;
             }
             else if (next == ShapeVar.CUBE)
             {
                 GetComponent<BoxCollider>().enabled = true;
                 GetComponent<MeshFilter>().mesh = cube;
+                chargeSlider.gameObject.SetActive(false);
                 mor = ShapeVar.CUBE;
             }
         }
@@ -371,30 +368,18 @@ public class PlayerController : MonoBehaviour
     {
         playerInBoundsCheck(other);
         checkpointCheck(other);
-<<<<<<< HEAD
-	}
-
-	void playerInBoundsCheck (Collider other) {
-		if (other.CompareTag ("KillBox")) {
-			transform.position = spawn.transform.position;
-			rb.velocity = new Vector3 (0.0f, 0.0f, 0.0f);
-			rb.angularVelocity = new Vector3 (0.0f, 0.0f, 0.0f);
-		}
-	}
-
-    void checkpointCheck(Collider other) {
-        if (other.CompareTag("Respawn")) {
-            //collided with checkpoint
-=======
     }
 
     void playerInBoundsCheck(Collider other)
     {
         if (other.CompareTag("KillBox"))
         {
+            Debug.Log("Touching killbox");
             transform.position = spawn.transform.position;
             rb.velocity = new Vector3(0.0f, 0.0f, 0.0f);
             rb.angularVelocity = new Vector3(0.0f, 0.0f, 0.0f);
+            // Update attempt number.
+            attemptNo++;             SetAttemptText();
         }
     }
 
@@ -402,14 +387,12 @@ public class PlayerController : MonoBehaviour
     {
         if (other.CompareTag("Respawn"))
         {
->>>>>>> 8a7ec8698e85c09fbc5c7c36d55171064b18f266
             other.GetComponent<MeshRenderer>().enabled = false;
             this.spawn.transform.position = other.gameObject.transform.position;
 
             saveGame();
         }
     }
-<<<<<<< HEAD
 
     void saveGame() {
         string curLevel = SceneManager.GetActiveScene().name;
@@ -432,18 +415,8 @@ public class PlayerController : MonoBehaviour
 		//}
 	//}
 
-	void OnCollisionEnter (Collision col)
-    {        
-=======
-    //void OnCollisionEnter(Collision collision){
-    //if(collision.gameObject.CompareTag ("Ground")) {
-    //grounded = true;
-    //}
-    //}
-
     void OnCollisionEnter(Collision col)
     {
->>>>>>> 8a7ec8698e85c09fbc5c7c36d55171064b18f266
         if (mor == ShapeVar.CUBE && col.collider.CompareTag("Breakable"))
         {
             Debug.Log("Blep");
@@ -462,7 +435,7 @@ public class PlayerController : MonoBehaviour
     {
     }
 
-
+    void SetAttemptText()     {         Debug.Log("Setting attempt text at attempt: " + attemptNo);         attemptText.text = "Attempt #" + attemptNo.ToString();         attemptText.enabled = true;         // Deactivate the text after 5 seconds.         StartCoroutine(deactivateText(5, attemptText));         Debug.Log("Called to deactivate text");     }      /*      * Deactivates text after a set amount of time.      */      IEnumerator deactivateText(int seconds, Text text)     {         Debug.Log("Deactivating text");         yield return new WaitForSeconds(seconds);         text.enabled = false;     }
 
 
 }
