@@ -94,6 +94,9 @@ public class PlayerController : MonoBehaviour
 
     Vector3 movement = new Vector3(0.0f, 0.0f, 0.0f);
 
+    // temp collider for collisions with moving platforms. needed for correct scaling
+    private GameObject colliderTemp = null;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -409,14 +412,15 @@ public class PlayerController : MonoBehaviour
         bf.Serialize(file, data);
         file.Close();
     }
-	//void OnCollisionEnter(Collision collision){
-		//if(collision.gameObject.CompareTag ("Ground")) {
-			//grounded = true;
-		//}
-	//}
 
     void OnCollisionEnter(Collision col)
     {
+        if (col.collider.gameObject.CompareTag("MovingGround"))
+        {
+            colliderTemp = new GameObject();
+            colliderTemp.transform.parent = col.collider.transform;
+            transform.parent = colliderTemp.transform;
+        }
         if (mor == ShapeVar.CUBE && col.collider.CompareTag("Breakable"))
         {
             Debug.Log("Blep");
@@ -431,11 +435,23 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void OnCollisionExit(Collision col)
+    private void OnCollisionExit(Collision col)
     {
+        if (col.collider.gameObject.CompareTag("MovingGround"))
+        {
+            transform.parent = null;
+            if (colliderTemp != null)
+            {
+                Destroy(colliderTemp);
+                colliderTemp = null;
+            }
+        }
     }
 
-    void SetAttemptText()     {         Debug.Log("Setting attempt text at attempt: " + attemptNo);         attemptText.text = "Attempt #" + attemptNo.ToString();         attemptText.enabled = true;         // Deactivate the text after 5 seconds.         StartCoroutine(deactivateText(5, attemptText));         Debug.Log("Called to deactivate text");     }      /*      * Deactivates text after a set amount of time.      */      IEnumerator deactivateText(int seconds, Text text)     {         Debug.Log("Deactivating text");         yield return new WaitForSeconds(seconds);         text.enabled = false;     }
+    void SetAttemptText()     {         Debug.Log("Setting attempt text at attempt: " + attemptNo);         attemptText.text = "Attempt #" + attemptNo.ToString();         attemptText.enabled = true;         // Deactivate the text after 5 seconds.         StartCoroutine(deactivateText(5, attemptText));         Debug.Log("Called to deactivate text");     }
+
+    /*      * Deactivates text after a set amount of time.      */
+    IEnumerator deactivateText(int seconds, Text text)     {         Debug.Log("Deactivating text");         yield return new WaitForSeconds(seconds);         text.enabled = false;     }
 
 
 }
