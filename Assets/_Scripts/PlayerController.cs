@@ -231,10 +231,10 @@ public class PlayerController : MonoBehaviour
                 camUpward = playerPointer.transform.up * (float)Input.GetAxis("Action") * ActionAmount;
                 grounded = false;
 
-                if (!jsound.isPlaying)
-                {
-                    jsound.Play();
-                }
+               // if (!jsound.isPlaying)
+               // {
+               //     jsound.Play();
+               // }
             }
             rb.AddForce(camUpward * speed);
         }
@@ -345,11 +345,11 @@ public class PlayerController : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 0.09f, layerMask, QueryTriggerInteraction.Ignore))
         {
             grounded = true;
-            if (hit.collider.CompareTag("Ground"))
+			if (hit.collider.CompareTag("Ground") || hit.collider.CompareTag("MovingGround"))
             {
                 Debug.DrawRay(ray.origin, ray.direction * 0.09f, Color.yellow, 3f);
             }
-            else
+			else
             {
                 Debug.DrawRay(ray.origin, ray.direction * 0.09f, Color.red, 3f);
                 grounded = false;
