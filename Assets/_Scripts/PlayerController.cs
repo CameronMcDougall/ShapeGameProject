@@ -96,6 +96,8 @@ public class PlayerController : MonoBehaviour
 
     // temp collider for collisions with moving platforms. needed for correct scaling
     private GameObject colliderTemp = null;
+    // the object the player is colliding with to avoid collisions twice
+    private GameObject collidingWith = null;
 
     void Start()
     {
@@ -415,11 +417,14 @@ public class PlayerController : MonoBehaviour
 
     void OnCollisionEnter(Collision col)
     {
-        if (col.collider.gameObject.CompareTag("MovingGround"))
+        if (collidingWith != col.collider.gameObject && col.collider.gameObject.CompareTag("MovingGround"))
         {
+            collidingWith = col.collider.gameObject;
             colliderTemp = new GameObject();
             colliderTemp.transform.parent = col.collider.transform;
+            var scale = transform.localScale;
             transform.parent = colliderTemp.transform;
+            transform.localScale = scale;
         }
         if (mor == ShapeVar.CUBE && col.collider.CompareTag("Breakable"))
         {
@@ -445,6 +450,7 @@ public class PlayerController : MonoBehaviour
                 Destroy(colliderTemp);
                 colliderTemp = null;
             }
+            collidingWith = null;
         }
     }
 
