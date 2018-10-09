@@ -104,6 +104,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         mor = ShapeVar.SPHERE;
         // Set the text for the current attempt.         SetAttemptText();         // Set the slider to be invisible at the start (so it only shows for the cylinder)         chargeSlider.gameObject.SetActive(false);
+        Debug.Log("Spawn transform position = " + spawn.transform.position);
     }
     
     void Update()
@@ -161,8 +162,8 @@ public class PlayerController : MonoBehaviour
             {
                 charge = charge + 1;
 
-                // Increase slider value:
-                chargeSlider.value += 2;                 cs_FillImage.color = Color.Lerp(cs_ZeroChargeColor, cs_FullChargeColor, chargeSlider.value / 100);
+                // Increase slider value: (Red to green)
+                chargeSlider.value += 1;                 cs_FillImage.color = Color.Lerp(cs_ZeroChargeColor, cs_FullChargeColor, chargeSlider.value / 100);
 
                 if (!csound.isPlaying)
                 {
@@ -174,7 +175,7 @@ public class PlayerController : MonoBehaviour
                 charge = charge + 1;
 
                 // Increase slider value:
-                if (chargeSlider.value < 99)                 {                     chargeSlider.value += 2;                     cs_FillImage.color = Color.Lerp(cs_ZeroChargeColor, cs_FullChargeColor, chargeSlider.value / 100);
+                if (chargeSlider.value < 99)                 {                     chargeSlider.value += 1;                     cs_FillImage.color = Color.Lerp(cs_ZeroChargeColor, cs_FullChargeColor, chargeSlider.value / 100);
                     //Debug.Log("Charge slider value = " + chargeSlider.value);
                 }
 
@@ -459,10 +460,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void SetAttemptText()     {         Debug.Log("Setting attempt text at attempt: " + attemptNo);         attemptText.text = "Attempt #" + attemptNo.ToString();         attemptText.enabled = true;         // Deactivate the text after 5 seconds.         StartCoroutine(deactivateText(5, attemptText));         Debug.Log("Called to deactivate text");     }
+    void SetAttemptText()     {         //Debug.Log("Setting attempt text at attempt: " + attemptNo);         attemptText.text = "Attempt #" + attemptNo.ToString();         attemptText.enabled = true;         // Deactivate the text after 5 seconds.         StartCoroutine(deactivateText(5, attemptText));         //Debug.Log("Called to deactivate text");     }
 
     /*      * Deactivates text after a set amount of time.      */
-    IEnumerator deactivateText(int seconds, Text text)     {         Debug.Log("Deactivating text");         yield return new WaitForSeconds(seconds);         text.enabled = false;     }
+    IEnumerator deactivateText(int seconds, Text text)     {         //Debug.Log("Deactivating text");         yield return new WaitForSeconds(seconds);         text.enabled = false;     }
 
 
 }
