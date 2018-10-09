@@ -93,38 +93,43 @@ public class PlayerController : MonoBehaviour
     List<GameObject> currentCollisions = new List<GameObject>();
 
     Vector3 movement = new Vector3(0.0f, 0.0f, 0.0f);
-
     // temp collider for collisions with moving platforms. needed for correct scaling
     private GameObject colliderTemp = null;
     // the object the player is colliding with to avoid collisions twice
     private GameObject collidingWith = null;
-
+    private bool hasPaused;
     void Start()
     {
+        hasPaused = false;
         rb = GetComponent<Rigidbody>();
         mor = ShapeVar.SPHERE;
         // Set the text for the current attempt.         SetAttemptText();         // Set the slider to be invisible at the start (so it only shows for the cylinder)         chargeSlider.gameObject.SetActive(false);
     }
-
+    
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            this.hasPaused = !this.hasPaused;
+        }
+            
+        if (!this.hasPaused)
+        {
+            Time.timeScale = 1.0f;
+            this.updateGame();
+        }
+        else {
+            Time.timeScale = 0.0f;
+
+        }   
+    }
+    void updateGame() {
         float deltaT = Time.deltaTime;
         shrinkDelay -= deltaT;
-
-        //Debug.Log (1 / 4);
-
         rayCastGround(getLowestVertex());
-
         updateShape();
-
         movementLogic();
-
         actionLogic();
-
-        //Debug.Log ("Grounded: " + grounded);
-
     }
-
     void movementLogic()
     {
         float fwdInput;
