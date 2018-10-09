@@ -94,6 +94,11 @@ public class PlayerController : MonoBehaviour
 
     Vector3 movement = new Vector3(0.0f, 0.0f, 0.0f);
 
+    // temp collider for collisions with moving platforms. needed for correct scaling
+    private GameObject colliderTemp = null;
+    // the object the player is colliding with to avoid collisions twice
+    private GameObject collidingWith = null;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -228,10 +233,10 @@ public class PlayerController : MonoBehaviour
                 camUpward = playerPointer.transform.up * (float)Input.GetAxis("Action") * ActionAmount;
                 grounded = false;
 
-                if (!jsound.isPlaying)
-                {
-                    jsound.Play();
-                }
+               // if (!jsound.isPlaying)
+               // {
+               //     jsound.Play();
+               // }
             }
             rb.AddForce(camUpward * speed);
         }
@@ -342,11 +347,11 @@ public class PlayerController : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 0.09f, layerMask, QueryTriggerInteraction.Ignore))
         {
             grounded = true;
-            if (hit.collider.CompareTag("Ground"))
+			if (hit.collider.CompareTag("Ground") || hit.collider.CompareTag("MovingGround"))
             {
                 Debug.DrawRay(ray.origin, ray.direction * 0.09f, Color.yellow, 3f);
             }
-            else
+			else
             {
                 Debug.DrawRay(ray.origin, ray.direction * 0.09f, Color.red, 3f);
                 grounded = false;
@@ -409,14 +414,18 @@ public class PlayerController : MonoBehaviour
         bf.Serialize(file, data);
         file.Close();
     }
-	//void OnCollisionEnter(Collision collision){
-		//if(collision.gameObject.CompareTag ("Ground")) {
-			//grounded = true;
-		//}
-	//}
 
     void OnCollisionEnter(Collision col)
     {
+        if (collidingWith != col.collider.gameObject && col.collider.gameObject.CompareTag("MovingGround"))
+        {
+            collidingWith = col.collider.gameObject;
+            colliderTemp = new GameObject();
+            colliderTemp.transform.parent = col.collider.transform;
+            var scale = transform.localScale;
+            transform.parent = colliderTemp.transform;
+            transform.localScale = scale;
+        }
         if (mor == ShapeVar.CUBE && col.collider.CompareTag("Breakable"))
         {
             Debug.Log("Blep");
@@ -431,11 +440,24 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void OnCollisionExit(Collision col)
+    private void OnCollisionExit(Collision col)
     {
+        if (col.collider.gameObject.CompareTag("MovingGround"))
+        {
+            transform.parent = null;
+            if (colliderTemp != null)
+            {
+                Destroy(colliderTemp);
+                colliderTemp = null;
+            }
+            collidingWith = null;
+        }
     }
 
-    void SetAttemptText()     {         Debug.Log("Setting attempt text at attempt: " + attemptNo);         attemptText.text = "Attempt #" + attemptNo.ToString();         attemptText.enabled = true;         // Deactivate the text after 5 seconds.         StartCoroutine(deactivateText(5, attemptText));         Debug.Log("Called to deactivate text");     }      /*      * Deactivates text after a set amount of time.      */      IEnumerator deactivateText(int seconds, Text text)     {         Debug.Log("Deactivating text");         yield return new WaitForSeconds(seconds);         text.enabled = false;     }
+    void SetAttemptText()     {         Debug.Log("Setting attempt text at attempt: " + attemptNo);         attemptText.text = "Attempt #" + attemptNo.ToString();         attemptText.enabled = true;         // Deactivate the text after 5 seconds.         StartCoroutine(deactivateText(5, attemptText));         Debug.Log("Called to deactivate text");     }
+
+    /*      * Deactivates text after a set amount of time.      */
+    IEnumerator deactivateText(int seconds, Text text)     {         Debug.Log("Deactivating text");         yield return new WaitForSeconds(seconds);         text.enabled = false;     }
 
 
 }
