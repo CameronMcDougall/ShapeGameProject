@@ -86,7 +86,10 @@ public class PlayerController : MonoBehaviour
     // Slider to visually show charging cylinder.     public Slider chargeSlider;     public Image cs_FillImage;                           public Color cs_FullChargeColor = Color.green;       public Color cs_ZeroChargeColor = Color.red; 
 
     // Displays the current attempt the player is on.
-    public Text attemptText;     private int attemptNo = 1;      // Displays the text at the end of the level for when the player beats it.     public Text finishText;
+    public Text attemptText;     private int attemptNo = 1;
+
+    // Text box to display the time the player is taking for the level.
+    public Text timerText;      // Displays the text at the end of the level for when the player beats it.     public Text finishText;
     public Text restartText;      // The time the player took to complete the level.     private float startTime;     private float timeTaken;
 
     // True if the game is over.
@@ -128,6 +131,8 @@ public class PlayerController : MonoBehaviour
             movementLogic();
 
             actionLogic();
+
+            updateTimer();
 
             //Debug.Log ("Grounded: " + grounded);
         } else {
@@ -484,11 +489,30 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void updateTimer(){
+        // Code for updating the timer in the level.
+        float currentTime = Time.time - startTime;
+        int minutes = (int)currentTime / 60;
+        int seconds = (int)currentTime % 60;
+        if (seconds < 10)
+        {
+            timerText.text = "Time: " + minutes + ":0" + seconds;
+        } else {
+            timerText.text = "Time: " + minutes + ":" + seconds;
+        }    
+    }
+
     void SetAttemptText()     {         Debug.Log("Setting attempt text at attempt: " + attemptNo);         attemptText.text = "Attempt #" + attemptNo.ToString();         attemptText.enabled = true;         // Deactivate the text after 5 seconds.         StartCoroutine(deactivateText(5, attemptText));         Debug.Log("Called to deactivate text");     }
 
     void displayFinishText()
     {
-        Debug.Log("Displaying finish text");         finishText.text = "Congratulations!\n Attempts taken: " + attemptNo + "\n Time taken: " + timeTaken + " seconds";     }
+        int minutes = (int) timeTaken / 60;
+        int seconds = (int)timeTaken % 60;
+        Debug.Log("Displaying finish text");
+        if (seconds < 10){             finishText.text = "Congratulations!\n Attempts taken: " + attemptNo + "\n Time taken: " + minutes + ":0" + seconds;
+        } else {
+            finishText.text = "Congratulations!\n Attempts taken: " + attemptNo + "\n Time taken: " + minutes + ":" + seconds;
+        }     }
 
     /*      * Deactivates text after a set amount of time.      */
     IEnumerator deactivateText(int seconds, Text text)     {         Debug.Log("Deactivating text");         yield return new WaitForSeconds(seconds);         text.enabled = false;     }
