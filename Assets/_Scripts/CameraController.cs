@@ -76,8 +76,13 @@ public class CameraController : MonoBehaviour {
 
         distance -= Input.GetAxis("ScrollWheel") * zoomSensitivity;
         Mathf.Clamp(distance, 1, 6);*/
-
+        
         transform.rotation *= Quaternion.Euler(new Vector3(-y, x));
+        if (transform.rotation.eulerAngles.x > 90f) {
+            //camera does not go under plane
+            transform.rotation = Quaternion.Euler(new Vector3(0f, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z));
+        }
+
         transform.Rotate(0, 0, -transform.eulerAngles.z);
 
 		transform.position = player.transform.position - transform.forward * camDist;
