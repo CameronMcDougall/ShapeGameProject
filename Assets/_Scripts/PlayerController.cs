@@ -114,18 +114,13 @@ public class PlayerController : MonoBehaviour
         startTime = Time.time;
         gameWon = false;
     }
-
     void Update()
     {
-        if (!gameWon)
-        {
+        if (!gameWon) {
             float deltaT = Time.deltaTime;
             shrinkDelay -= deltaT;
-
             //Debug.Log (1 / 4);
-
             rayCastGround(getLowestVertex());
-
             updateShape();
 
             movementLogic();
@@ -135,12 +130,14 @@ public class PlayerController : MonoBehaviour
             updateTimer();
 
             //Debug.Log ("Grounded: " + grounded);
-        } else {
+        }
+        else
+        {
             // Ask if the player wishes to restart.
             askRestart();
         }
-
     }
+
 
     void movementLogic()
     {
