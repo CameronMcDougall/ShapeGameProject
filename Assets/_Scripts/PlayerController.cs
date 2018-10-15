@@ -284,7 +284,10 @@ public class PlayerController : MonoBehaviour
         //Explosion effect for morphing
         var exp = GetComponent<ParticleSystem>();
         //currentCollisions = new List<GameObject>();
-
+        if (shrunk && mor != ShapeVar.CUBE)
+        {
+            this.shrink(false);
+        }
         ShapeVar next = ShapeVar.NONE;
         if (Input.GetKeyDown(KeyCode.Alpha1) && mor != ShapeVar.SPHERE)
             next = ShapeVar.SPHERE;
