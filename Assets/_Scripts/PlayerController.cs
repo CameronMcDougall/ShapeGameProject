@@ -125,7 +125,7 @@ public class PlayerController : MonoBehaviour
 
             movementLogic();
 
-            actionLogic();
+
 
             updateTimer();
 
@@ -136,6 +136,11 @@ public class PlayerController : MonoBehaviour
             // Ask if the player wishes to restart.
             askRestart();
         }
+    }
+
+    private void FixedUpdate()
+    {
+        actionLogic();
     }
 
 
@@ -244,6 +249,16 @@ public class PlayerController : MonoBehaviour
             Vector3 camUpward = new Vector3(0.0f, 0.0f, 0.0f);
             if (grounded & (Input.GetAxis("Action") > 0))
             {
+
+                // The ball jumps at variable heights because it tries to counteract its current velocity. 
+                // Sometimes it is adding to a negative down force (making it jump lower), and sometimes it is adding to
+                // an up force, making it bounce extra high.
+
+                // Resets the ball's upward velocity to be 0, so it can always achieve the same height on every jump.
+                Vector3 vector3 = rb.velocity;
+                vector3.y = 0;
+                rb.velocity = vector3;
+
                 camUpward = playerPointer.transform.up * (float)Input.GetAxis("Action") * ActionAmount;
                 grounded = false;
 
@@ -311,6 +326,7 @@ public class PlayerController : MonoBehaviour
                 GetComponent<SphereCollider>().enabled = true;
                 GetComponent<MeshFilter>().mesh = sphere;
                 chargeSlider.gameObject.SetActive(false);
+                rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
                 mor = ShapeVar.SPHERE;
             }
             else if (next == ShapeVar.CYLINDER)
@@ -318,6 +334,7 @@ public class PlayerController : MonoBehaviour
                 GetComponent<MeshCollider>().enabled = true;
                 GetComponent<MeshFilter>().mesh = cylinder;
                 chargeSlider.gameObject.SetActive(true);
+                rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 mor = ShapeVar.CYLINDER;
             }
             else if (next == ShapeVar.CUBE)
@@ -325,6 +342,7 @@ public class PlayerController : MonoBehaviour
                 GetComponent<BoxCollider>().enabled = true;
                 GetComponent<MeshFilter>().mesh = cube;
                 chargeSlider.gameObject.SetActive(false);
+                rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
                 mor = ShapeVar.CUBE;
             }
         }
