@@ -479,6 +479,10 @@ public class PlayerController : MonoBehaviour
             transform.parent = colliderTemp.transform;
             transform.localScale = scale;
         }
+        if (mor == ShapeVar.SPHERE && col.collider.CompareTag("Water_Current"))
+        {
+            bob();
+        }
         if (mor == ShapeVar.CUBE && col.collider.CompareTag("Breakable"))
         {
             Debug.Log("Blep");
@@ -505,6 +509,12 @@ public class PlayerController : MonoBehaviour
             }
             collidingWith = null;
         }
+    }
+
+    // if in water, control the player's flotation etc
+    void bob()
+    {
+        
     }
 
     void updateTimer(){
