@@ -52,7 +52,7 @@ public class MenuManager : MonoBehaviour {
                 this.hasEscaped = false;
             }
         }
-        print("Has Escaped:" + this.hasEscaped);
+        // print("Has Escaped:" + this.hasEscaped);
         if (!this.hasEscaped)
         {
             if (Input.GetKey(KeyCode.Escape))
