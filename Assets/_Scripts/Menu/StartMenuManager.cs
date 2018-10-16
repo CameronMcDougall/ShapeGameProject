@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+
 public class StartMenuManager : MenuManager {
     public List<Button> buttons;
     private List<Action> actions;
@@ -41,7 +44,20 @@ public class StartMenuManager : MenuManager {
     }
     void onLoad()
     {
+        /// here is to loading the game
+        if (File.Exists(Application.persistentDataPath + "/autosave.dat")) {
 
+            //getting the list of saved games and closing the fileOpener
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(Application.persistentDataPath + "/autosave.dat", FileMode.OpenOrCreate);
+            List<GameData> savedGames = (List<GameData>) bf.Deserialize(file);
+            file.Close();
+
+            //Queue < GameData > savedGames = tempQueue.savesQueue;
+            GameData to_load = savedGames[savedGames.Count-1];
+            StaticCheckpoint.spawn_point = to_load.checkPointName;
+            SceneManager.LoadScene(to_load.levelName);
+        }
     }
 
     void onSelectLevel()

@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.UI;
+using System;
 
 public class PlayerController : MonoBehaviour
 {
@@ -106,13 +107,27 @@ public class PlayerController : MonoBehaviour
     // the object the player is colliding with to avoid collisions twice
     private GameObject collidingWith = null;
 
+     void Awake()
+    {
+        if (StaticCheckpoint.spawn_point != null) {
+            GameObject to_find = GameObject.Find(StaticCheckpoint.spawn_point);
+            if (to_find != null) {
+                spawn.transform.position = to_find.transform.position;
+                Debug.Log("found a savegame!: checkpoint: " + StaticCheckpoint.spawn_point);
+            }
+        }    
+    }
     void Start()
     {
+        //this is to keep the object persistent from scene to scene, currently just testing for savegame
+        DontDestroyOnLoad(gameObject);
+
         rb = GetComponent<Rigidbody>();
         mor = ShapeVar.SPHERE;
         // Set the text for the current attempt.         SetAttemptText();         // Set the slider to be invisible at the start (so it only shows for the cylinder)         chargeSlider.gameObject.SetActive(false);
         startTime = Time.time;
         gameWon = false;
+        gameObject.transform.position = spawn.transform.position;
     }
     void Update()
     {
@@ -399,11 +414,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
-    void LateUpdate()
-    {
-    }
-
     void OnTriggerEnter(Collider other)
     {
         // Check if the player has won before checking the others in order to finish the game and ignore killboxes.
@@ -425,14 +435,84 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /*
+     * CHECKPOINT EVENT HANDLER 
+     * 
+     */
     void checkpointCheck(Collider other)
     {
         if (other.CompareTag("Respawn"))
         {
             other.GetComponent<MeshRenderer>().enabled = false;
             this.spawn.transform.position = other.gameObject.transform.position;
-
+            this.spawn = other.gameObject;
             saveGame();
+        }
+    }
+
+    void saveGame()
+    {
+        Debug.Log(Application.persistentDataPath);
+        //save game parameters -> must correspond to attributes in the GameData C# class
+        string curLevel = SceneManager.GetActiveScene().name;
+        string checkpointName = this.spawn.name;
+
+
+        List<GameData> savedGames = loadSavedGamesList();
+        //get existing loadfiles to update them by overwrite a save, or adding a savefile;
+
+        GameData to_save = new GameData(curLevel, checkpointName); // must correspond to attributes in the GameData C# class
+        Debug.Log(to_save.checkPointName + "---" + to_save.levelName);
+        if (savedGames.Count < 3)
+        {
+            savedGames.Add(to_save);
+        }
+        else
+        {
+            //overwriting via first come first serve
+            for (int i = 0; i < 1; i++) {
+                savedGames[i] = savedGames[i + 1];
+            }
+            savedGames[3] = to_save;
+        }
+        //transform to bypass queue object for serialization
+
+        string saveDest = Application.persistentDataPath + "/autosave.dat";
+        FileStream savefile;
+        if (File.Exists(saveDest)) savefile = File.Create(saveDest);
+        else savefile = File.Create(saveDest);
+
+        BinaryFormatter bf = new BinaryFormatter();
+        bf.Serialize(savefile, savedGames);
+        savefile.Close();
+
+        Debug.Log("(for quan le) game has been saved  at: " + saveDest);
+    }
+    
+
+    private List<GameData> loadSavedGamesList()
+    {
+        if (File.Exists(Application.persistentDataPath + "/autosave.dat"))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream loadFile = File.Open(Application.persistentDataPath + "/autosave.dat", FileMode.OpenOrCreate);
+            object tempQueue = bf.Deserialize(loadFile);
+            Debug.Log("1 " + tempQueue.GetType().FullName);
+
+            List<GameData> test = tempQueue as List<GameData>;
+            Debug.Log("2 " + test);
+
+            //QueueGamedata test2 = (QueueGamedata)tempQueue;
+            //Debug.Log("3 " + test2);
+            //loadFile.Close();
+
+            List<GameData> result = test;
+
+            return result;
+        }
+
+        else {
+            return new List<GameData>();
         }
     }
 
@@ -443,22 +523,6 @@ public class PlayerController : MonoBehaviour
             // End the game.
             gameWon = true;
          }     }
-
-    void saveGame() {
-        string curLevel = SceneManager.GetActiveScene().name;
-        string checkpointNAme = spawn.name;
-
-        string destination = Application.persistentDataPath + "/autosave.dat";
-        FileStream file;
-
-        if (File.Exists(destination)) file = File.OpenWrite(destination);
-        else file = File.Create(destination);
-
-        GameData data = new GameData(curLevel, checkpointNAme);
-        BinaryFormatter bf = new BinaryFormatter();
-        bf.Serialize(file, data);
-        file.Close();
-    }
 
     void askRestart() {
         restartText.text = "PRESS 'R' TO RESTART";
