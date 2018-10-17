@@ -543,11 +543,11 @@ public class PlayerController : MonoBehaviour
             transform.parent = colliderTemp.transform;
             transform.localScale = scale;
         }
-        if (mor == ShapeVar.SPHERE && col.collider.CompareTag("Water_Current"))
+        if (mor == ShapeVar.SPHERE && (col.collider.CompareTag("Water_Current") || col.collider.CompareTag("Water_Still")));
         {
             bob();
         }
-        if (mor == ShapeVar.CUBE && col.collider.CompareTag("Breakable"))
+        if (mor == ShapeVar.CUBE && !shrunk && col.collider.CompareTag("Breakable"))
         {
             Debug.Log("Blep");
             Vector3 momentum = rb.velocity * rb.mass; // p=mv
@@ -576,9 +576,9 @@ public class PlayerController : MonoBehaviour
     }
 
     // if in water, control the player's flotation etc
-    void bob()
+    private void bob()
     {
-        
+        // rb.AddForce(new Vector3(0.0f, 1.0f, 0.0f));
     }
 
     void updateTimer(){
