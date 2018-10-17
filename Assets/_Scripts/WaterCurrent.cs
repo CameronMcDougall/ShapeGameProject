@@ -13,6 +13,7 @@ public class WaterCurrent : MonoBehaviour {
     public float velocity; // magnitude of speed of objects
     [SerializeField]
     public float direction; // angle (0-360) at which the water current moves
+    // relative to the orientation of the block.
 
     private float FACTOR = 100f;
 
@@ -25,7 +26,8 @@ public class WaterCurrent : MonoBehaviour {
     {
         if (collision.collider.gameObject.CompareTag("Player"))
         {
-            Debug.Log("Entered water");
+            // the ball is in the water so get rid of prev velocity. 
+            collision.collider.gameObject.GetComponent<Rigidbody>().velocity = new Vector3(0.0f, 0.0f, 0.0f);
         }
     }
 
@@ -33,15 +35,13 @@ public class WaterCurrent : MonoBehaviour {
     {
         if (collision.collider.gameObject.CompareTag("Player"))
         {
-            collision.collider.gameObject.transform.position += new Vector3(1.0f, 0.0f, 0.0f) * (velocity / FACTOR);
-        }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.collider.gameObject.CompareTag("Player"))
-        {
-            Debug.Log("exited water");
+            float delta = velocity / FACTOR;
+            var trans = collision.collider.gameObject.transform;
+            // TODO: Clean up this maths here to use unitys vectors rather than raw maths
+            float dx = delta * Mathf.Sin(direction * Mathf.Deg2Rad);
+            float dy = delta * Mathf.Cos(direction * Mathf.Deg2Rad);
+            collision.collider.gameObject.GetComponent<Rigidbody>().velocity = new Vector3(dx, 0.0f, dy) * Time.deltaTime; 
+            trans.position += new Vector3(dx, 0.0f, dy);
         }
     }
 }

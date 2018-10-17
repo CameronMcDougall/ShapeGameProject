@@ -127,7 +127,7 @@ public class PlayerController : MonoBehaviour
         // Set the text for the current attempt.         SetAttemptText();         // Set the slider to be invisible at the start (so it only shows for the cylinder)         chargeSlider.gameObject.SetActive(false);
         startTime = Time.time;
         gameWon = false;
-        gameObject.transform.position = spawn.transform.position;
+        //gameObject.transform.position = spawn.transform.position;
     }
     void Update()
     {
@@ -397,7 +397,7 @@ public class PlayerController : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 0.09f, layerMask, QueryTriggerInteraction.Ignore))
         {
             grounded = true;
-			if (hit.collider.CompareTag("Ground") || hit.collider.CompareTag("MovingGround"))
+			if (hit.collider.CompareTag("Ground") || hit.collider.CompareTag("MovingGround") || hit.collider.CompareTag("Water_Current"))
             {
                 Debug.DrawRay(ray.origin, ray.direction * 0.09f, Color.yellow, 3f);
             }
