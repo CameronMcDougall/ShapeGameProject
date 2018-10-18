@@ -84,14 +84,26 @@ public class PlayerController : MonoBehaviour
     public AudioSource msound;
     public AudioSource lsound;
 
-    // Slider to visually show charging cylinder.     public Slider chargeSlider;     public Image cs_FillImage;                           public Color cs_FullChargeColor = Color.green;       public Color cs_ZeroChargeColor = Color.red; 
+    // Slider to visually show charging cylinder.
+    public Slider chargeSlider;
+    public Image cs_FillImage;                      
+    public Color cs_FullChargeColor = Color.green;  
+    public Color cs_ZeroChargeColor = Color.red; 
 
     // Displays the current attempt the player is on.
-    public Text attemptText;     private int attemptNo = 1;
+    public Text attemptText;
+    private int attemptNo = 1;
 
     // Text box to display the time the player is taking for the level.
-    public Text timerText;      // Displays the text at the end of the level for when the player beats it.     public Text finishText;
-    public Text restartText;      // The time the player took to complete the level.     private float startTime;     private float timeTaken;
+    public Text timerText;
+
+    // Displays the text at the end of the level for when the player beats it.
+    public Text finishText;
+    public Text restartText;
+
+    // The time the player took to complete the level.
+    private float startTime;
+    private float timeTaken;
 
     // True if the game is over.
     private bool gameWon = false;
@@ -119,12 +131,12 @@ public class PlayerController : MonoBehaviour
     }
     void Start()
     {
-        //this is to keep the object persistent from scene to scene, currently just testing for savegame
-        DontDestroyOnLoad(gameObject);
-
         rb = GetComponent<Rigidbody>();
         mor = ShapeVar.SPHERE;
-        // Set the text for the current attempt.         SetAttemptText();         // Set the slider to be invisible at the start (so it only shows for the cylinder)         chargeSlider.gameObject.SetActive(false);
+        // Set the text for the current attempt.
+        SetAttemptText();
+        // Set the slider to be invisible at the start (so it only shows for the cylinder)
+        chargeSlider.gameObject.SetActive(false);
         startTime = Time.time;
         gameWon = false;
         gameObject.transform.position = spawn.transform.position;
@@ -191,7 +203,8 @@ public class PlayerController : MonoBehaviour
                 charge = charge + 1;
 
                 // Increase slider value:
-                chargeSlider.value += 2;                 cs_FillImage.color = Color.Lerp(cs_ZeroChargeColor, cs_FullChargeColor, chargeSlider.value / 100);
+                chargeSlider.value += 2;
+                cs_FillImage.color = Color.Lerp(cs_ZeroChargeColor, cs_FullChargeColor, chargeSlider.value / 100);
 
                 if (!csound.isPlaying)
                 {
@@ -203,7 +216,10 @@ public class PlayerController : MonoBehaviour
                 charge = charge + 1;
 
                 // Increase slider value:
-                if (chargeSlider.value < 99)                 {                     chargeSlider.value += 2;                     cs_FillImage.color = Color.Lerp(cs_ZeroChargeColor, cs_FullChargeColor, chargeSlider.value / 100);
+                if (chargeSlider.value < 99)
+                {
+                    chargeSlider.value += 2;
+                    cs_FillImage.color = Color.Lerp(cs_ZeroChargeColor, cs_FullChargeColor, chargeSlider.value / 100);
                     //Debug.Log("Charge slider value = " + chargeSlider.value);
                 }
 
@@ -220,7 +236,8 @@ public class PlayerController : MonoBehaviour
                 rb.AddForce(actionCl);
                 charge = 0;
                 // Reset slider value.
-                chargeSlider.value = 0;                 cs_FillImage.color = Color.Lerp(cs_ZeroChargeColor, cs_FullChargeColor, chargeSlider.value / 100);
+                chargeSlider.value = 0;
+                cs_FillImage.color = Color.Lerp(cs_ZeroChargeColor, cs_FullChargeColor, chargeSlider.value / 100);
             }
         }
         else if (mor == ShapeVar.CUBE)
@@ -431,7 +448,8 @@ public class PlayerController : MonoBehaviour
             rb.velocity = new Vector3(0.0f, 0.0f, 0.0f);
             rb.angularVelocity = new Vector3(0.0f, 0.0f, 0.0f);
             // Update attempt number.
-            attemptNo++;             SetAttemptText();
+            attemptNo++;
+            SetAttemptText();
         }
     }
 
@@ -473,20 +491,20 @@ public class PlayerController : MonoBehaviour
             for (int i = 0; i < 1; i++) {
                 savedGames[i] = savedGames[i + 1];
             }
-            savedGames[3] = to_save;
+            savedGames[2] = to_save;
         }
         //transform to bypass queue object for serialization
 
         string saveDest = Application.persistentDataPath + "/autosave.dat";
         FileStream savefile;
-        if (File.Exists(saveDest)) savefile = File.Create(saveDest);
+        if (File.Exists(saveDest)) savefile = File.OpenWrite(saveDest);
         else savefile = File.Create(saveDest);
 
         BinaryFormatter bf = new BinaryFormatter();
         bf.Serialize(savefile, savedGames);
         savefile.Close();
 
-        Debug.Log("(for quan le) game has been saved  at: " + saveDest);
+        Debug.Log("game has been saved  at: " + saveDest);
     }
     
 
@@ -504,7 +522,7 @@ public class PlayerController : MonoBehaviour
 
             //QueueGamedata test2 = (QueueGamedata)tempQueue;
             //Debug.Log("3 " + test2);
-            //loadFile.Close();
+            loadFile.Close();
 
             List<GameData> result = test;
 
@@ -516,13 +534,19 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void playerWinCheck(Collider other)     {         if (other.CompareTag("Finish"))         {
+    void playerWinCheck(Collider other)
+    {
+        if (other.CompareTag("Finish"))
+        {
             // Print win text and list the attempts and time taken.
             Debug.Log("Touching the finish");
-            timeTaken = Time.time - startTime;             displayFinishText();
+            timeTaken = Time.time - startTime;
+            displayFinishText();
             // End the game.
             gameWon = true;
-         }     }
+
+        }
+    }
 
     void askRestart() {
         restartText.text = "PRESS 'R' TO RESTART";
@@ -594,20 +618,37 @@ public class PlayerController : MonoBehaviour
         }    
     }
 
-    void SetAttemptText()     {         Debug.Log("Setting attempt text at attempt: " + attemptNo);         attemptText.text = "Attempt #" + attemptNo.ToString();         attemptText.enabled = true;         // Deactivate the text after 5 seconds.         StartCoroutine(deactivateText(5, attemptText));         Debug.Log("Called to deactivate text");     }
+    void SetAttemptText()
+    {
+        Debug.Log("Setting attempt text at attempt: " + attemptNo);
+        attemptText.text = "Attempt #" + attemptNo.ToString();
+        attemptText.enabled = true;
+        // Deactivate the text after 5 seconds.
+        StartCoroutine(deactivateText(5, attemptText));
+        Debug.Log("Called to deactivate text");
+    }
 
     void displayFinishText()
     {
         int minutes = (int) timeTaken / 60;
         int seconds = (int)timeTaken % 60;
         Debug.Log("Displaying finish text");
-        if (seconds < 10){             finishText.text = "Congratulations!\n Attempts taken: " + attemptNo + "\n Time taken: " + minutes + ":0" + seconds;
+        if (seconds < 10){
+            finishText.text = "Congratulations!\n Attempts taken: " + attemptNo + "\n Time taken: " + minutes + ":0" + seconds;
         } else {
             finishText.text = "Congratulations!\n Attempts taken: " + attemptNo + "\n Time taken: " + minutes + ":" + seconds;
-        }     }
+        }
+    }
 
-    /*      * Deactivates text after a set amount of time.      */
-    IEnumerator deactivateText(int seconds, Text text)     {         Debug.Log("Deactivating text");         yield return new WaitForSeconds(seconds);         text.enabled = false;     }
+    /*
+     * Deactivates text after a set amount of time.
+     */
+    IEnumerator deactivateText(int seconds, Text text)
+    {
+        Debug.Log("Deactivating text");
+        yield return new WaitForSeconds(seconds);
+        text.enabled = false;
+    }
 
 
 }
