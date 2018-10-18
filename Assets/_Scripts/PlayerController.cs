@@ -139,7 +139,7 @@ public class PlayerController : MonoBehaviour
         chargeSlider.gameObject.SetActive(false);
         startTime = Time.time;
         gameWon = false;
-        gameObject.transform.position = spawn.transform.position;
+        //gameObject.transform.position = spawn.transform.position;
     }
     void Update()
     {
@@ -414,7 +414,7 @@ public class PlayerController : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 0.09f, layerMask, QueryTriggerInteraction.Ignore))
         {
             grounded = true;
-			if (hit.collider.CompareTag("Ground") || hit.collider.CompareTag("MovingGround"))
+			if (hit.collider.CompareTag("Ground") || hit.collider.CompareTag("MovingGround") || hit.collider.CompareTag("Water_Current"))
             {
                 Debug.DrawRay(ray.origin, ray.direction * 0.09f, Color.yellow, 3f);
             }
@@ -567,11 +567,11 @@ public class PlayerController : MonoBehaviour
             transform.parent = colliderTemp.transform;
             transform.localScale = scale;
         }
-        if (mor == ShapeVar.SPHERE && col.collider.CompareTag("Water_Current"))
+        if (mor == ShapeVar.SPHERE && (col.collider.CompareTag("Water_Current") || col.collider.CompareTag("Water_Still")));
         {
             bob();
         }
-        if (mor == ShapeVar.CUBE && col.collider.CompareTag("Breakable"))
+        if (mor == ShapeVar.CUBE && !shrunk && col.collider.CompareTag("Breakable"))
         {
             Debug.Log("Blep");
             Vector3 momentum = rb.velocity * rb.mass; // p=mv
@@ -600,9 +600,9 @@ public class PlayerController : MonoBehaviour
     }
 
     // if in water, control the player's flotation etc
-    void bob()
+    private void bob()
     {
-        
+        // rb.AddForce(new Vector3(0.0f, 1.0f, 0.0f));
     }
 
     void updateTimer(){
