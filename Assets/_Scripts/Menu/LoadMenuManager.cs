@@ -31,7 +31,7 @@ public class LoadMenuManager : MenuManager {
 
         //gets and print save files to buttons
         
-        this.getSaveFiles();
+        //this.getSaveFiles();
         if (savedGames != null) {
             for (int i = 0; i < savedGames.Count; i++) {
                 GameData data = savedGames[i];
@@ -59,10 +59,10 @@ public class LoadMenuManager : MenuManager {
     {
         this.actions = new List<Action>();
         this.initEscape();
-        actions.Add(() => loadSaveGame(0));
-        actions.Add(() => loadSaveGame(1));
-        actions.Add(() => loadSaveGame(2));
-        actions.Add(() => onBack());
+        this.actions.Add(() => loadSaveGame(0));
+        this.actions.Add(() => loadSaveGame(1));
+        this.actions.Add(() => loadSaveGame(2));
+        this.actions.Add(() => onBack());
     }
 
     void initEscape()
@@ -95,10 +95,5 @@ public class LoadMenuManager : MenuManager {
         SceneManager.LoadScene("StartMenu");
     }
 
-    // Use this for initialization
-
-    // Update is called once per frame
-    void Update () {
-		
-	}
+   
 }

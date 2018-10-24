@@ -45,6 +45,7 @@ public class MenuManager : MonoBehaviour {
     }
     private void Update()
     {
+       print("current selection: "+this.currentSelection);
         if (hasEscaped)
         {
             if (Time.unscaledTime - this.timeEscaped >= this.maxTimeToMove)
