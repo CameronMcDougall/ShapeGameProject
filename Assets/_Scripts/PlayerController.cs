@@ -139,7 +139,7 @@ public class PlayerController : MonoBehaviour
         chargeSlider.gameObject.SetActive(false);
         startTime = Time.time;
         gameWon = false;
-        //gameObject.transform.position = spawn.transform.position;
+        gameObject.transform.position = spawn.transform.position;
     }
     void Update()
     {
@@ -149,11 +149,7 @@ public class PlayerController : MonoBehaviour
             //Debug.Log (1 / 4);
             rayCastGround(getLowestVertex());
             updateShape();
-
             movementLogic();
-
-
-
             updateTimer();
 
             //Debug.Log ("Grounded: " + grounded);

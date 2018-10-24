@@ -24,20 +24,22 @@ public class LoadMenuManager : MenuManager {
     }
     void initButtons()
     {
-        this.buttons[0].onClick.AddListener(loadSaveGame1);
-        this.buttons[1].onClick.AddListener(loadSaveGame2);
-        this.buttons[2].onClick.AddListener(loadSaveGame3);
+        this.buttons[0].onClick.AddListener(delegate { loadSaveGame(0);});
+        this.buttons[1].onClick.AddListener(delegate { loadSaveGame(1);});
+        this.buttons[2].onClick.AddListener(delegate { loadSaveGame(2);});
         this.buttons[3].onClick.AddListener(onBack);
 
+        //gets and print save files to buttons
+        
         this.getSaveFiles();
-
         if (savedGames != null) {
             for (int i = 0; i < savedGames.Count; i++) {
-                GameData data = savedGames[savedGames.Count - (1 + i)];
+                GameData data = savedGames[i];
                 this.buttons[i].GetComponentInChildren<Text>().text =
                     data.levelName + " | " + data.checkPointName; 
             }
         }
+        
     }
 
     void getSaveFiles()
@@ -49,6 +51,7 @@ public class LoadMenuManager : MenuManager {
             FileStream file = File.Open(Application.persistentDataPath + "/autosave.dat", FileMode.OpenOrCreate);
             savedGames = (List<GameData>)bf.Deserialize(file);
             file.Close();
+            Debug.Log(Application.persistentDataPath);
         }
     }
 
@@ -56,9 +59,9 @@ public class LoadMenuManager : MenuManager {
     {
         this.actions = new List<Action>();
         this.initEscape();
-        actions.Add(() => loadSaveGame1());
-        actions.Add(() => loadSaveGame2());
-        actions.Add(() => loadSaveGame3());
+        actions.Add(() => loadSaveGame(0));
+        actions.Add(() => loadSaveGame(1));
+        actions.Add(() => loadSaveGame(2));
         actions.Add(() => onBack());
     }
 
@@ -67,18 +70,29 @@ public class LoadMenuManager : MenuManager {
         this.escape = () => onBack();
     }
 
-    void loadSaveGame1() {
+    void loadSaveGame(int num)
+    {
+        if (File.Exists(Application.persistentDataPath + "/autosave.dat"))
+        {
+            //getting the list of saved games and closing the fileOpener
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(Application.persistentDataPath + "/autosave.dat", FileMode.OpenOrCreate);
+            List<GameData> savedGames = (List<GameData>)bf.Deserialize(file);
+            file.Close();
 
-    }
-    void loadSaveGame2() {
-    }
-    void loadSaveGame3() {
+            //Queue < GameData > savedGames = tempQueue.savesQueue;
+            if (num <= savedGames.Count - 1) {
+                GameData to_load = savedGames[num];
+                StaticCheckpoint.spawn_point = to_load.checkPointName;
+                SceneManager.LoadScene(to_load.levelName);
+            }
+        }
     }
 
 
     void onBack ()
     {
-        Application.Quit();
+        SceneManager.LoadScene("StartMenu");
     }
 
     // Use this for initialization
