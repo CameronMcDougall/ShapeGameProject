@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
      */
 
     // representation of current shape. better than a single arbitrary integer
-    protected enum ShapeVar { SPHERE, CYLINDER, CUBE, NONE };
+    protected enum ShapeVar { SPHERE, CYLINDER, CUBE, TOP, NONE };
 
     private Rigidbody rb;
 
@@ -78,6 +78,7 @@ public class PlayerController : MonoBehaviour
     public Mesh sphere;
     public Mesh cube;
     public Mesh cylinder;
+    public Mesh top;
 
     public AudioSource jsound;
     public AudioSource csound;
@@ -89,6 +90,8 @@ public class PlayerController : MonoBehaviour
     public Image cs_FillImage;                      
     public Color cs_FullChargeColor = Color.green;  
     public Color cs_ZeroChargeColor = Color.red; 
+
+    // Animation for the spinning top     Animator m_animator;     bool spinning;     // Bool to check if the top has an item picked up:     bool haveItem;     public Transform pickUpLocation;     Transform pickedUpT = null;     GameObject pickedUpGO;
 
     // Displays the current attempt the player is on.
     public Text attemptText;
@@ -133,6 +136,9 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         mor = ShapeVar.SPHERE;
+        // Set the animator for the top and other related fields:
+        m_animator = GetComponent<Animator>();         m_animator.enabled = false;         spinning = false;
+        haveItem = false;
         // Set the text for the current attempt.
         SetAttemptText();
         // Set the slider to be invisible at the start (so it only shows for the cylinder)
@@ -163,7 +169,8 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        actionLogic();
+        if (!gameWon)
+            actionLogic();
     }
 
 
@@ -177,6 +184,8 @@ public class PlayerController : MonoBehaviour
             sideInput = 0f;
             transform.RotateAround(playerPointer.transform.position, playerPointer.transform.up, Input.GetAxis("Horizontal"));
         }
+        else if (mor == ShapeVar.TOP)
+        {             fwdInput = Input.GetAxisRaw("Vertical");             sideInput = Input.GetAxisRaw("Horizontal");         }
         else
         {
             fwdInput = Input.GetAxis("Vertical");
@@ -186,7 +195,16 @@ public class PlayerController : MonoBehaviour
         Vector3 camRight2 = new Vector3(cam.transform.right.x, 0.0f, cam.transform.right.z) * sideInput;
         movement = camForward2 + camRight2;
 
-        rb.AddForce(movement * speed);
+        if (!spinning)
+            rb.AddForce(movement * speed);
+        else {
+            // Move without using the add force.
+            float v = Input.GetAxis("Vertical");
+            float h = Input.GetAxis("Horizontal");
+            float dx = h * speed * Time.deltaTime * 0.05f;
+            float dz = v * speed * Time.deltaTime * 0.05f;
+            transform.position = new Vector3(transform.position.x + dx, transform.position.y, transform.position.z + dz);
+        }
     }
 
     void actionLogic()
@@ -272,6 +290,12 @@ public class PlayerController : MonoBehaviour
             }
             rb.AddForce(down);
         }
+        else if (mor == ShapeVar.TOP)         {             // Make the top spin by playing the animation.             if (Input.GetAxis("Action") > 0)             {                 // First play the animation to get it to stand back up. Then play the spinning animation straight after.                 m_animator.enabled = true;                 spinning = true;                 m_animator.speed = 1;                 //m_animator.Play("Start Up");                 m_animator.SetBool("Start_Spinning", true);                  //transform.position = transform.forward * Time.deltaTime * dz;                 //rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+
+                // Currently this controls how the top moves when standing still.
+                // If set to FreezeAll, then the top stays still and only moves when input is provided.
+                // However this makes it able to clip through walls if travelling at normal speed, which is unwanted.
+                // Having constraints just set to FreezeRotation will ensure collisions happen, but the top moves on its own a bit with no input.                 rb.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX;             } else {                 //GetComponent<Animator>().StopPlayback();                 // How to stop? Could set speed to 0.                 m_animator.SetBool("Start_Spinning", false);                 //m_animator.                 m_animator.enabled = false;                 spinning = false;                 if (haveItem)                 {                     pickedUpT.parent = null;                     Vector3 dropPos = new Vector3(this.transform.position.x, this.transform.position.y + 2, this.transform.position.z);                     pickedUpT.transform.position = dropPos;                     pickedUpGO.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;                     pickedUpGO.GetComponent<Rigidbody>().useGravity = true;                     haveItem = false;                     pickedUpGO = null;                     pickedUpT = null;                 }                 rb.constraints = RigidbodyConstraints.None;                 //m_animator.speed = 0;                 //animation.Stop();             }          }
         else
         {
             Vector3 camUpward = new Vector3(0.0f, 0.0f, 0.0f);
@@ -338,7 +362,7 @@ public class PlayerController : MonoBehaviour
             next = ShapeVar.CYLINDER;
         if (Input.GetKeyDown(KeyCode.Alpha3) && mor != ShapeVar.CUBE)
             next = ShapeVar.CUBE;
-
+        if (Input.GetKeyDown(KeyCode.Alpha4) && mor != ShapeVar.TOP)             next = ShapeVar.TOP; 
         if (next != ShapeVar.NONE)
         {
             exp.Play();
@@ -348,7 +372,9 @@ public class PlayerController : MonoBehaviour
                 GetComponent<MeshCollider>().enabled = false;
             else if (mor == ShapeVar.CUBE)
                 GetComponent<BoxCollider>().enabled = false;
-
+            else if (mor == ShapeVar.TOP)
+                GetComponent<MeshCollider>().enabled = false;
+            
             if (next == ShapeVar.SPHERE)
             {
                 GetComponent<SphereCollider>().enabled = true;
@@ -359,6 +385,7 @@ public class PlayerController : MonoBehaviour
             }
             else if (next == ShapeVar.CYLINDER)
             {
+                GetComponent<MeshCollider>().sharedMesh = cylinder;
                 GetComponent<MeshCollider>().enabled = true;
                 GetComponent<MeshFilter>().mesh = cylinder;
                 chargeSlider.gameObject.SetActive(true);
@@ -373,6 +400,7 @@ public class PlayerController : MonoBehaviour
                 rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
                 mor = ShapeVar.CUBE;
             }
+            else if (next == ShapeVar.TOP)             {                 // Need to change the mesh collider mesh to be top instead of cylinder.                 GetComponent<MeshCollider>().sharedMesh = top;                 GetComponent<MeshCollider>().enabled = true;                 GetComponent<MeshFilter>().mesh = top;                 chargeSlider.gameObject.SetActive(false);                 rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;                 mor = ShapeVar.TOP;             } 
         }
     }
 
@@ -463,6 +491,11 @@ public class PlayerController : MonoBehaviour
             saveGame();
         }
     }
+    /*
+     * Checks if collided with an object marked pickupable with the tag 'Pickup'.
+     * 
+     */
+    void pickUpCheck(Collider other){         if (other.CompareTag("Pickup") && spinning && !haveItem){             haveItem = true;             //other.transform.SetParent(this.transform);             pickedUpGO = other.gameObject;             pickedUpGO.GetComponent<Rigidbody>().useGravity = false;             pickedUpT = other.transform;             // How to get this to be floating above this.transform rather than on the side of it             // or wherever contact is made?             pickedUpT.position = pickUpLocation.position;             pickedUpT.transform.SetParent(transform);             pickedUpGO.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePosition;         }     } 
 
     void saveGame()
     {
@@ -579,6 +612,7 @@ public class PlayerController : MonoBehaviour
                 rb.angularVelocity = new Vector3(0.0f, 0.0f, 0.0f);
             }
         }
+        pickUpCheck(col.collider);
     }
 
     private void OnCollisionExit(Collision col)
@@ -616,12 +650,10 @@ public class PlayerController : MonoBehaviour
 
     void SetAttemptText()
     {
-        Debug.Log("Setting attempt text at attempt: " + attemptNo);
         attemptText.text = "Attempt #" + attemptNo.ToString();
         attemptText.enabled = true;
         // Deactivate the text after 5 seconds.
         StartCoroutine(deactivateText(5, attemptText));
-        Debug.Log("Called to deactivate text");
     }
 
     void displayFinishText()
