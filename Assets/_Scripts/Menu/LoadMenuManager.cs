@@ -15,6 +15,7 @@ public class LoadMenuManager : MenuManager {
     private Action escape;
     void Start()
     {
+        print(Application.persistentDataPath+"");
         this.initActions();
         this.initButtons();
         base.setActions(this.loadActions);

@@ -45,10 +45,7 @@ public class MenuManager : MonoBehaviour {
     }
     private void Update()
     {
-<<<<<<< HEAD
-       //print("current selection: "+this.currentSelection);
-=======
->>>>>>> da5e09a3b7546bd9d3226b392d04ba6a73e4702d
+
         if (hasEscaped)
         {
             if (Time.unscaledTime - this.timeEscaped >= this.maxTimeToMove)
@@ -56,7 +53,6 @@ public class MenuManager : MonoBehaviour {
                 this.hasEscaped = false;
             }
         }
-        // print("Has Escaped:" + this.hasEscaped);
         if (!this.hasEscaped)
         {
             if (Input.GetKey(KeyCode.Escape))
