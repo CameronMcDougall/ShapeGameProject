@@ -31,7 +31,7 @@ public class LoadMenuManager : MenuManager {
 
         //gets and print save files to buttons
         
-        //this.getSaveFiles();
+        this.getSaveFiles();
         if (savedGames != null) {
             for (int i = 0; i < savedGames.Count; i++) {
                 GameData data = savedGames[i];

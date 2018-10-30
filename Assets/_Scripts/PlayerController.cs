@@ -517,7 +517,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             //overwriting via first come first serve
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < 2; i++) {
                 savedGames[i] = savedGames[i + 1];
             }
             savedGames[2] = to_save;
