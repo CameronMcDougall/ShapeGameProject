@@ -7,6 +7,7 @@ public class VentEffect : MonoBehaviour {
 	private Rigidbody rb;
 	private Vector3 force;
 	private Transform parentTrans;
+	public float ventPower;
 
 	// Use this for initialization
 	void Start () {
@@ -32,8 +33,8 @@ public class VentEffect : MonoBehaviour {
 		Transform otherTrans = rb.GetComponentInParent<Transform> ();
 		Vector3 disp = parentTrans.position - otherTrans.position;
 		Debug.Log (disp.ToString());
-		float power = 11.0f - Mathf.Clamp(disp.magnitude, 1.0f, 10.0f);
-		float yThrust = 40.0f * power;
+		float power = 11.0f; //- Mathf.Clamp(disp.magnitude, 1.0f, 2.0f);
+		float yThrust = 10f * power;
 		return new Vector3 (0.0f, yThrust, 0.0f);
 	}
 }
