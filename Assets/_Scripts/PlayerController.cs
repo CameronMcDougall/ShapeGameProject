@@ -245,8 +245,8 @@ public class PlayerController : MonoBehaviour
             {
                 msound.Stop();
                 lsound.Play();
-                Vector3 actionCl = (playerPointer.transform.forward * boost) + playerPointer.transform.up * 40;
-                rb.AddForce(actionCl);
+                Vector3 launchForce = cam.transform.forward.normalized + (transform.up * 40);
+                rb.AddForce(launchForce * boost);
                 charge = 0;
                 // Reset slider value.
                 chargeSlider.value = 0;
