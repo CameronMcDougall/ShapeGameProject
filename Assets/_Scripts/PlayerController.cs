@@ -108,8 +108,7 @@ public class PlayerController : MonoBehaviour
     private float startTime;
     private float timeTaken;
 
-    // True if the game is over.
-    private bool gameWon = false;
+    // True if the level has been beaten     private bool levelWon = false;      public LevelManager levelManager;
 
     private int vexCycler = 0;
 
@@ -144,12 +143,12 @@ public class PlayerController : MonoBehaviour
         // Set the slider to be invisible at the start (so it only shows for the cylinder)
         chargeSlider.gameObject.SetActive(false);
         startTime = Time.time;
-        gameWon = false;
+        levelWon = false;
         gameObject.transform.position = spawn.transform.position;
     }
     void Update()
     {
-        if (!gameWon) {
+        if (!levelWon) {
             float deltaT = Time.deltaTime;
             shrinkDelay -= deltaT;
             //Debug.Log (1 / 4);
@@ -169,7 +168,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!gameWon)
+        if (!levelWon)
             actionLogic();
     }
 
@@ -358,11 +357,11 @@ public class PlayerController : MonoBehaviour
         ShapeVar next = ShapeVar.NONE;
         if (Input.GetKeyDown(KeyCode.Alpha1) && mor != ShapeVar.SPHERE)
             next = ShapeVar.SPHERE;
-        if (Input.GetKeyDown(KeyCode.Alpha2) && mor != ShapeVar.CYLINDER)
+        if (Input.GetKeyDown(KeyCode.Alpha2) && mor != ShapeVar.CYLINDER && levelManager.getCurrentLevel() >= 2)
             next = ShapeVar.CYLINDER;
-        if (Input.GetKeyDown(KeyCode.Alpha3) && mor != ShapeVar.CUBE)
+        if (Input.GetKeyDown(KeyCode.Alpha3) && mor != ShapeVar.CUBE && levelManager.getCurrentLevel() >= 3)
             next = ShapeVar.CUBE;
-        if (Input.GetKeyDown(KeyCode.Alpha4) && mor != ShapeVar.TOP)             next = ShapeVar.TOP; 
+        if (Input.GetKeyDown(KeyCode.Alpha4) && mor != ShapeVar.TOP && levelManager.getCurrentLevel() >= 3)             next = ShapeVar.TOP; 
         if (next != ShapeVar.NONE)
         {
             exp.Play();
@@ -380,6 +379,7 @@ public class PlayerController : MonoBehaviour
                 GetComponent<SphereCollider>().enabled = true;
                 GetComponent<MeshFilter>().mesh = sphere;
                 chargeSlider.gameObject.SetActive(false);
+                spinning = false;                 m_animator.enabled = false;
                 rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
                 mor = ShapeVar.SPHERE;
             }
@@ -389,6 +389,7 @@ public class PlayerController : MonoBehaviour
                 GetComponent<MeshCollider>().enabled = true;
                 GetComponent<MeshFilter>().mesh = cylinder;
                 chargeSlider.gameObject.SetActive(true);
+                spinning = false;                 m_animator.enabled = false;
                 rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 mor = ShapeVar.CYLINDER;
             }
@@ -397,6 +398,7 @@ public class PlayerController : MonoBehaviour
                 GetComponent<BoxCollider>().enabled = true;
                 GetComponent<MeshFilter>().mesh = cube;
                 chargeSlider.gameObject.SetActive(false);
+                spinning = false;                 m_animator.enabled = false;
                 rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
                 mor = ShapeVar.CUBE;
             }
@@ -465,7 +467,7 @@ public class PlayerController : MonoBehaviour
 
     void playerInBoundsCheck(Collider other)
     {
-        if (other.CompareTag("KillBox") && !gameWon)
+        if (other.CompareTag("KillBox") && !levelWon)
         {
             Debug.Log("Touching killbox");
             transform.position = spawn.transform.position;
@@ -572,16 +574,18 @@ public class PlayerController : MonoBehaviour
             timeTaken = Time.time - startTime;
             displayFinishText();
             // End the game.
-            gameWon = true;
+            levelWon = true;
 
         }
     }
 
     void askRestart() {
-        restartText.text = "PRESS 'R' TO RESTART";
-        if (Input.GetKeyDown("r")){
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
+        restartText.text = "PRESS 'R' TO RESTART OR ENTER TO CONTINUE";         if (Input.GetKeyDown("r"))
+        {             SceneManager.LoadScene(SceneManager.GetActiveScene().name);         }
+        else if (Input.GetKeyDown(KeyCode.Return))
+        {
+            // Takes the user to the next level.
+            levelManager.LoadNextLevel();         } 
     }
 
 
