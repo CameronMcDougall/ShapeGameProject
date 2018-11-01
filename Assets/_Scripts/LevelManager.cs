@@ -16,7 +16,7 @@ public class LevelManager : MonoBehaviour {
 
     void Awake()
     {
-        currentLevel = SceneManager.GetActiveScene().buildIndex - 3;
+        currentLevel = SceneManager.GetActiveScene().buildIndex - 2;
     }
 
     public void LoadScene(string name) {
