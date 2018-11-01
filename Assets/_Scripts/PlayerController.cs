@@ -245,7 +245,7 @@ public class PlayerController : MonoBehaviour
             {
                 msound.Stop();
                 lsound.Play();
-                Vector3 launchForce = cam.transform.forward.normalized + (transform.up * 40);
+                Vector3 launchForce = cam.transform.forward.normalized*40 + (cam.transform.up * 15);
                 rb.AddForce(launchForce * boost);
                 charge = 0;
                 // Reset slider value.
@@ -379,7 +379,8 @@ public class PlayerController : MonoBehaviour
                 GetComponent<SphereCollider>().enabled = true;
                 GetComponent<MeshFilter>().mesh = sphere;
                 chargeSlider.gameObject.SetActive(false);
-                spinning = false;                 m_animator.enabled = false;
+                spinning = false;
+                speed = 80;                 m_animator.enabled = false;
                 rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
                 mor = ShapeVar.SPHERE;
             }
@@ -390,6 +391,7 @@ public class PlayerController : MonoBehaviour
                 GetComponent<MeshFilter>().mesh = cylinder;
                 chargeSlider.gameObject.SetActive(true);
                 spinning = false;                 m_animator.enabled = false;
+                speed = 160;
                 rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 mor = ShapeVar.CYLINDER;
             }
@@ -398,11 +400,13 @@ public class PlayerController : MonoBehaviour
                 GetComponent<BoxCollider>().enabled = true;
                 GetComponent<MeshFilter>().mesh = cube;
                 chargeSlider.gameObject.SetActive(false);
-                spinning = false;                 m_animator.enabled = false;
+                spinning = false;
+                speed = 80;                 m_animator.enabled = false;
                 rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
                 mor = ShapeVar.CUBE;
             }
-            else if (next == ShapeVar.TOP)             {                 // Need to change the mesh collider mesh to be top instead of cylinder.                 GetComponent<MeshCollider>().sharedMesh = top;                 GetComponent<MeshCollider>().enabled = true;                 GetComponent<MeshFilter>().mesh = top;                 chargeSlider.gameObject.SetActive(false);                 rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;                 mor = ShapeVar.TOP;             } 
+            else if (next == ShapeVar.TOP)             {                 // Need to change the mesh collider mesh to be top instead of cylinder.                 GetComponent<MeshCollider>().sharedMesh = top;                 GetComponent<MeshCollider>().enabled = true;                 GetComponent<MeshFilter>().mesh = top;                 chargeSlider.gameObject.SetActive(false);
+                speed = 80;                 rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;                 mor = ShapeVar.TOP;             } 
         }
     }
 
@@ -677,7 +681,7 @@ public class PlayerController : MonoBehaviour
      */
     IEnumerator deactivateText(int seconds, Text text)
     {
-        Debug.Log("Deactivating text");
+        //Debug.Log("Deactivating text");
         yield return new WaitForSeconds(seconds);
         text.enabled = false;
     }
