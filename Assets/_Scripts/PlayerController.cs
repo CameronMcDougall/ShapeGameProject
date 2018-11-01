@@ -374,7 +374,7 @@ public class PlayerController : MonoBehaviour
                 GetComponent<MeshFilter>().mesh = cylinder;
                 chargeSlider.gameObject.SetActive(true);
                 spinning = false;                 m_animator.enabled = false;
-                speed = 160;
+                speed = 240;
                 rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 mor = ShapeVar.CYLINDER;
             }
