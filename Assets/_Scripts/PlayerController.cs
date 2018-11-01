@@ -344,7 +344,7 @@ public class PlayerController : MonoBehaviour
             next = ShapeVar.CYLINDER;
         if (Input.GetKeyDown(KeyCode.Alpha3) && mor != ShapeVar.CUBE && levelManager.getCurrentLevel() >= 3)
             next = ShapeVar.CUBE;
-        if (Input.GetKeyDown(KeyCode.Alpha4) && mor != ShapeVar.TOP && levelManager.getCurrentLevel() >= 3)             next = ShapeVar.TOP; 
+        if (Input.GetKeyDown(KeyCode.Alpha4) && mor != ShapeVar.TOP && levelManager.getCurrentLevel() >= 4)             next = ShapeVar.TOP; 
         if (next != ShapeVar.NONE)
         {
             exp.Play();
