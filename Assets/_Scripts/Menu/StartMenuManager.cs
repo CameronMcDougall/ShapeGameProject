@@ -22,24 +22,27 @@ public class StartMenuManager : MenuManager {
     void initButtons() {
         this.buttons[0].onClick.AddListener(onStart);
         this.buttons[1].onClick.AddListener(onLoad);
-        this.buttons[2].onClick.AddListener(onSelectLevel);
-        this.buttons[3].onClick.AddListener(onQuit);
+        this.buttons[2].onClick.AddListener(onQuit);
     }
     void initActions() {
         this.actions = new List<Action>();
         this.initEscape();
         actions.Add(() => onStart());
         actions.Add(() => onLoad());
-        actions.Add(() => onSelectLevel());
         actions.Add(() => onQuit());
     }
 
     void initEscape() {
         this.escape = () => onQuit();
     }
-    
+    int findLastFile() {
+        DirectoryInfo d = new DirectoryInfo(@Application.persistentDataPath);//Assuming Test is your Folder
+        FileInfo[] Files = d.GetFiles("*.dat"); //Getting Text files
+        return Files.Length+1;
+    }
     void onStart()
     {
+        PlayerPrefs.SetInt("SaveFile", findLastFile());
         SceneManager.LoadScene("Level_1");
     }
     void onLoad()
@@ -47,10 +50,6 @@ public class StartMenuManager : MenuManager {
         SceneManager.LoadScene("LoadMenu");
     }
 
-    void onSelectLevel()
-    {
-
-    }
     void onQuit()
     {
         Application.Quit();

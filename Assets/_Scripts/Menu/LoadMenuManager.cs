@@ -7,41 +7,30 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 
-public class LoadMenuManager : MenuManager {
-
-    public List<Button> loadButtons;
+public class LoadMenuManager : MenuManager
+{
+    public GameObject buttonPref;
+    private List<Button> loadButtons;
     private List<Action> loadActions;
     private List<GameData> savedGames;
     private Action escape;
     void Start()
     {
-        print(Application.persistentDataPath+"");
-        this.initActions();
-        this.initButtons();
+        this.loadActions = new List<Action>();
+        this.loadButtons = new List<Button>();
+        this.getSaves();
         base.setActions(this.loadActions);
         base.setButtons(this.loadButtons);
         base.setEscapeAction(escape);
         base.setMenuObject(this.gameObject);
     }
-    void initButtons()
-    {
-        this.loadButtons[0].onClick.AddListener(delegate { loadSaveGame(0);});
-        this.loadButtons[1].onClick.AddListener(delegate { loadSaveGame(1);});
-        this.loadButtons[2].onClick.AddListener(delegate { loadSaveGame(2);});
-        this.loadButtons[3].onClick.AddListener(onBack);
 
-        //gets and print save files to buttons
-        
-        this.getSaveFiles();
-        if (savedGames != null) {
-            print(savedGames.Count);
-            for (int i = 0; i < savedGames.Count; i++) {
-                GameData data = savedGames[i];
-                this.loadButtons[i].GetComponentInChildren<Text>().text =
-                    data.levelName + " | " + data.checkPointName; 
-            }
-        }
-        
+    void createButton(string text, string date,Transform pos)
+    { 
+        GameObject button = Instantiate(buttonPref,pos);
+        Button but = button.GetComponent<Button>();
+        but.GetComponentInChildren<Text>().text = text + "- " + date;
+        loadButtons.Add(but);
     }
    
     void getSaveFiles()
@@ -57,48 +46,71 @@ public class LoadMenuManager : MenuManager {
             print(savedGames.Count);
         }
 
-       
-    }
 
-    void initActions()
-    {
-        this.loadActions = new List<Action>();
-        this.initEscape();
-        this.loadActions.Add(() => loadSaveGame(0));
-        this.loadActions.Add(() => loadSaveGame(1));
-        this.loadActions.Add(() => loadSaveGame(2));
-        this.loadActions.Add(() => onBack());
     }
 
     void initEscape()
     {
         this.escape = () => onBack();
     }
-
-    void loadSaveGame(int num)
+    private void getSaves()
     {
-        if (File.Exists(Application.persistentDataPath + "/autosave.dat"))
+        DirectoryInfo d = new DirectoryInfo(@Application.persistentDataPath);//Assuming Test is your Folder
+        FileInfo[] Files = d.GetFiles("*.dat"); //Getting Text files
+        Transform transform = this.transform;
+        float yOffset = 0;
+        for (int i = Files.Length-1; i >= 0; i--)
+        {
+            FileInfo file = Files[i];
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream f = File.Open(Application.persistentDataPath + "/" + file.Name, FileMode.OpenOrCreate);
+            List<GameData> savedGames = (List<GameData>)bf.Deserialize(f);
+            f.Close();
+
+            //Queue < GameData > savedGames = tempQueue.savesQueue;
+
+            GameData to_load = savedGames[0];
+            this.createButton(to_load.levelName, to_load.timestamp, transform);
+            this.loadButtons[this.loadButtons.Count -1 ].GetComponent<RectTransform>().position += new Vector3(0,yOffset,0);
+            this.loadActions.Add(()=> loadSaveGame(file.Name));
+            yOffset -= loadButtons[this.loadButtons.Count - 1].GetComponent<RectTransform>().rect.height + 5;
+        }
+        print(transform.position);
+        this.createButton("Back", "", transform);
+        this.loadButtons[this.loadButtons.Count - 1].GetComponent<RectTransform>().position += new Vector3(0, yOffset, 0);
+        this.loadButtons[this.loadButtons.Count - 1].GetComponentInChildren<Text>().fontSize = 14;
+        this.loadActions.Add(() => onBack());
+        this.initEscape();
+    }
+
+    void loadSaveGame(string fileName)
+    {
+        if (File.Exists(Application.persistentDataPath + "/" + fileName))
         {
             //getting the list of saved games and closing the fileOpener
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(Application.persistentDataPath + "/autosave.dat", FileMode.OpenOrCreate);
+            FileStream file = File.Open(Application.persistentDataPath + "/" + fileName, FileMode.OpenOrCreate);
             List<GameData> savedGames = (List<GameData>)bf.Deserialize(file);
             file.Close();
 
             //Queue < GameData > savedGames = tempQueue.savesQueue;
-            if (num <= savedGames.Count - 1) {
-                GameData to_load = savedGames[num];
-                StaticCheckpoint.spawn_point = to_load.checkPointName;
-                SceneManager.LoadScene(to_load.levelName);
-            }
+            string temp = fileName;
+            temp = temp.Replace("autosave","");
+            temp = temp.Replace(".dat", "");
+            int saveFileNum = (temp != "") ? Int32.Parse(temp): 1;
+            PlayerPrefs.SetInt("SaveFile", saveFileNum);
+            GameData to_load = savedGames[0];
+            StaticCheckpoint.spawn_point = to_load.checkPointName;
+            SceneManager.LoadScene(to_load.levelName);
+
         }
     }
 
 
-    void onBack ()
+    void onBack()
     {
         SceneManager.LoadScene("StartMenu");
     }
 
-   
+
 }

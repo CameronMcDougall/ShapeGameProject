@@ -6,6 +6,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.UI;
 using System;
+using System.Linq;
 
 public class PlayerController : MonoBehaviour
 {
@@ -110,12 +111,12 @@ public class PlayerController : MonoBehaviour
     List<GameObject> currentCollisions = new List<GameObject>();
 
     Vector3 movement = new Vector3(0.0f, 0.0f, 0.0f);
-
+    private int fileNum;
     // temp collider for collisions with moving platforms. needed for correct scaling
     private GameObject colliderTemp = null;
     // the object the player is colliding with to avoid collisions twice
     private GameObject collidingWith = null;
-
+   
      void Awake()
     {
         if (StaticCheckpoint.spawn_point != null) {
@@ -128,6 +129,7 @@ public class PlayerController : MonoBehaviour
     }
     void Start()
     {
+        fileNum = PlayerPrefs.GetInt("SaveFile");
         rb = GetComponent<Rigidbody>();
         mor = ShapeVar.SPHERE;
         // Set the animator for the top and other related fields:
@@ -166,7 +168,6 @@ public class PlayerController : MonoBehaviour
         if (!levelWon)
             actionLogic();
     }
-
 
     void movementLogic()
     {
@@ -497,7 +498,6 @@ public class PlayerController : MonoBehaviour
         //get existing loadfiles to update them by overwrite a save, or adding a savefile;
 
         GameData to_save = new GameData(curLevel, checkpointName); // must correspond to attributes in the GameData C# class
-        Debug.Log(to_save.checkPointName + "---" + to_save.levelName);
         if (savedGames.Count < 3)
         {
             savedGames.Add(to_save);
@@ -512,7 +512,7 @@ public class PlayerController : MonoBehaviour
         }
         //transform to bypass queue object for serialization
 
-        string saveDest = Application.persistentDataPath + "/autosave.dat";
+        string saveDest = Application.persistentDataPath + "/autosave"+fileNum+".dat";
         FileStream savefile;
         if (File.Exists(saveDest)) savefile = File.OpenWrite(saveDest);
         else savefile = File.Create(saveDest);
@@ -527,10 +527,10 @@ public class PlayerController : MonoBehaviour
 
     private List<GameData> loadSavedGamesList()
     {
-        if (File.Exists(Application.persistentDataPath + "/autosave.dat"))
+        if (File.Exists(Application.persistentDataPath + "/autosave" + fileNum + ".dat"))
         {
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream loadFile = File.Open(Application.persistentDataPath + "/autosave.dat", FileMode.OpenOrCreate);
+            FileStream loadFile = File.Open(Application.persistentDataPath + "/autosave" + fileNum + ".dat", FileMode.OpenOrCreate);
             object tempQueue = bf.Deserialize(loadFile);
             Debug.Log("1 " + tempQueue.GetType().FullName);
 
