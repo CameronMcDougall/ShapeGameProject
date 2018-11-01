@@ -14,6 +14,8 @@ public class LevelManager : MonoBehaviour {
 
     private int currentLevel = -1;
 
+    private int lastLevel = 3;
+
     void Awake()
     {
         currentLevel = SceneManager.GetActiveScene().buildIndex - 2;
@@ -32,8 +34,20 @@ public class LevelManager : MonoBehaviour {
         // else end the game
     }
 
-    public int getCurrentLevel() {
+    public void RestartLevel(){
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public string GetCurrentLevelName(){
+        return SceneManager.GetActiveScene().name;
+    }
+
+    public int GetCurrentLevel() {
         return currentLevel;
+    }
+
+    public bool OnLastLevel() {
+        return currentLevel == lastLevel;
     }
 
 }

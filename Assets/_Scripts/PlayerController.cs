@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.UI;
@@ -98,13 +97,14 @@ public class PlayerController : MonoBehaviour
 
     // Displays the text at the end of the level for when the player beats it.
     public Text finishText;
-    public Text restartText;
+    public Text continueText;
 
     // The time the player took to complete the level.
     private float startTime;
     private float timeTaken;
 
-    // True if the level has been beaten     private bool levelWon = false;      public LevelManager levelManager;
+    // True if the level has been beaten     private bool levelWon = false;     private bool gameWon = false;
+     public LevelManager levelManager;
 
     private int vexCycler = 0;
 
@@ -156,10 +156,12 @@ public class PlayerController : MonoBehaviour
 
             //Debug.Log ("Grounded: " + grounded);
         }
-        else
+        else if (levelWon)
         {
             // Ask if the player wishes to restart.
-            askRestart();
+            AskContinue();
+        } else {
+            WinGame();
         }
     }
 
@@ -340,11 +342,11 @@ public class PlayerController : MonoBehaviour
         ShapeVar next = ShapeVar.NONE;
         if (Input.GetKeyDown(KeyCode.Alpha1) && mor != ShapeVar.SPHERE)
             next = ShapeVar.SPHERE;
-        if (Input.GetKeyDown(KeyCode.Alpha2) && mor != ShapeVar.CYLINDER && levelManager.getCurrentLevel() >= 2)
+        if (Input.GetKeyDown(KeyCode.Alpha2) && mor != ShapeVar.CYLINDER && levelManager.GetCurrentLevel() >= 2)
             next = ShapeVar.CYLINDER;
-        if (Input.GetKeyDown(KeyCode.Alpha3) && mor != ShapeVar.CUBE && levelManager.getCurrentLevel() >= 3)
+        if (Input.GetKeyDown(KeyCode.Alpha3) && mor != ShapeVar.CUBE && levelManager.GetCurrentLevel() >= 3)
             next = ShapeVar.CUBE;
-        if (Input.GetKeyDown(KeyCode.Alpha4) && mor != ShapeVar.TOP && levelManager.getCurrentLevel() >= 4)             next = ShapeVar.TOP; 
+        if (Input.GetKeyDown(KeyCode.Alpha4) && mor != ShapeVar.TOP && levelManager.GetCurrentLevel() >= 4)             next = ShapeVar.TOP; 
         if (next != ShapeVar.NONE)
         {
             exp.Play();
@@ -490,7 +492,7 @@ public class PlayerController : MonoBehaviour
     {
         Debug.Log(Application.persistentDataPath);
         //save game parameters -> must correspond to attributes in the GameData C# class
-        string curLevel = SceneManager.GetActiveScene().name;
+        string curLevel = levelManager.GetCurrentLevelName();
         string checkpointName = this.spawn.name;
 
 
@@ -559,20 +561,25 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Touching the finish");
             timeTaken = Time.time - startTime;
             displayFinishText();
-            // End the game.
-            levelWon = true;
+            // End the level if not on the last level.
+            if (!levelManager.OnLastLevel())
+            {
+                levelWon = true;
+            } else {
+                gameWon = true;
+            }
 
         }
     }
 
-    void askRestart() {
-        restartText.text = "PRESS 'R' TO RESTART OR ENTER TO CONTINUE";         if (Input.GetKeyDown("r"))
-        {             SceneManager.LoadScene(SceneManager.GetActiveScene().name);         }
-        else if (Input.GetKeyDown(KeyCode.Return))
-        {
+    private void AskContinue()
+    {         continueText.text = "PRESS 'R' TO RESTART OR ENTER TO CONTINUE";         if (Input.GetKeyDown("r"))         {             levelManager.RestartLevel();         }         else if (Input.GetKeyDown(KeyCode.Return))         {
             // Takes the user to the next level.
-            levelManager.LoadNextLevel();         } 
-    }
+            levelManager.LoadNextLevel();         }      }
+
+    private void WinGame()
+    {         continueText.text = "PRESS 'R' TO RESTART";         if (Input.GetKeyDown("r"))
+        {             levelManager.RestartLevel();         }     }
 
 
     void OnCollisionEnter(Collision col)
