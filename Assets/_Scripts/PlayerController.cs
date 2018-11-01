@@ -80,11 +80,6 @@ public class PlayerController : MonoBehaviour
     public Mesh cylinder;
     public Mesh top;
 
-    public AudioSource jsound;
-    public AudioSource csound;
-    public AudioSource msound;
-    public AudioSource lsound;
-
     // Slider to visually show charging cylinder.
     public Slider chargeSlider;
     public Image cs_FillImage;                      
@@ -219,10 +214,6 @@ public class PlayerController : MonoBehaviour
                 chargeSlider.value += 2;
                 cs_FillImage.color = Color.Lerp(cs_ZeroChargeColor, cs_FullChargeColor, chargeSlider.value / 100);
 
-                if (!csound.isPlaying)
-                {
-                    csound.Play();
-                }
             }
             if ((Input.GetAxis("Action") > 0) && grounded && charge >= 50)
             {
@@ -236,15 +227,10 @@ public class PlayerController : MonoBehaviour
                     //Debug.Log("Charge slider value = " + chargeSlider.value);
                 }
 
-                if (!msound.isPlaying)
-                {
-                    msound.Play();
-                }
+         
             }
             if ((Input.GetAxis("Action") == 0) && grounded && charge >= 50)
             {
-                msound.Stop();
-                lsound.Play();
                 Vector3 launchForce = cam.transform.forward.normalized*40 + (cam.transform.up * 15);
                 rb.AddForce(launchForce * boost);
                 charge = 0;
@@ -313,10 +299,6 @@ public class PlayerController : MonoBehaviour
                 camUpward = playerPointer.transform.up * (float)Input.GetAxis("Action") * ActionAmount;
                 grounded = false;
 
-               // if (!jsound.isPlaying)
-               // {
-               //     jsound.Play();
-               // }
             }
             rb.AddForce(camUpward * speed);
         }
