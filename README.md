@@ -5,6 +5,11 @@ Shapes is a puzzle-platformer that focuses on player character morphing. Unlike 
 Open the ShapesGame.exe file and choose your video settings. The menu will load and you can start playing the game.
 ## Video Demonstration
 [Video Link](https://www.youtube.com/watch?v=2lXCOFFgSdI&feature=youtu.be)
+## Individual Assessment Links
+- **Cameron McDougall (mcdougcame)**: [report link](https://github.com/CameronMcDougall/ShapeGameProject/blob/master/IndividualAssessment/mcdougcame.md)
+- **Kristian Hansen (hansenkris)**: [report link](https://github.com/CameronMcDougall/ShapeGameProject/blob/master/IndividualAssessment/hansenkris.md)
+- **Lorens Hansen (hansenlore)**: [report link](https://github.com/CameronMcDougall/ShapeGameProject/blob/master/IndividualAssessment/hansenlore.md)
+- **Quan Le (lequan1)**: [report link](https://github.com/CameronMcDougall/ShapeGameProject/blob/master/IndividualAssessment/lequan1.md)
 ## How to play:
 use WASD keys to move, SPACEBAR to use special ability. ESC to pause, number keys starting from 1 depending on what characters you have level you are on.
 ## Characters:
