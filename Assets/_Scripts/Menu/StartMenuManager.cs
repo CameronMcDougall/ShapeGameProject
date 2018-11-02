@@ -7,29 +7,29 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 public class StartMenuManager : MenuManager {
-    public List<Button> buttons;
-    private List<Action> actions;
+    public List<Button> startButtons;
+    private List<Action> startActions;
     private Action escape;
     void Start()
     {
+        base.setMenuObject(this.gameObject);
         this.initActions();
         this.initButtons();
-        base.setActions(this.actions);
-        base.setButtons(this.buttons);
+        base.setActions(this.startActions);
+        base.setButtons(this.startButtons);
         base.setEscapeAction(escape);
-        base.setMenuObject(this.gameObject);
     }
     void initButtons() {
-        this.buttons[0].onClick.AddListener(onStart);
-        this.buttons[1].onClick.AddListener(onLoad);
-        this.buttons[2].onClick.AddListener(onQuit);
+        this.startButtons[0].onClick.AddListener(onStart);
+        this.startButtons[1].onClick.AddListener(onLoad);
+        this.startButtons[2].onClick.AddListener(onQuit);
     }
     void initActions() {
-        this.actions = new List<Action>();
+        this.startActions = new List<Action>();
         this.initEscape();
-        actions.Add(() => onStart());
-        actions.Add(() => onLoad());
-        actions.Add(() => onQuit());
+        this.startActions.Add(() => onStart());
+        this.startActions.Add(() => onLoad());
+        this.startActions.Add(() => onQuit());
     }
 
     void initEscape() {

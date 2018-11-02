@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.UI;
 using System;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -487,18 +488,33 @@ public class PlayerController : MonoBehaviour
      * 
      */
     void pickUpCheck(Collider other){         if (other.CompareTag("Pickup") && spinning && !haveItem){             haveItem = true;             //other.transform.SetParent(this.transform);             pickedUpGO = other.gameObject;             pickedUpGO.GetComponent<Rigidbody>().useGravity = false;             pickedUpT = other.transform;             // How to get this to be floating above this.transform rather than on the side of it             // or wherever contact is made?             pickedUpT.position = pickUpLocation.position;             pickedUpT.transform.SetParent(transform);             pickedUpGO.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePosition;         }     } 
-
+    int findWithAttr(List<GameData> checkpoints, string checkpoint)
+    {
+        for (int i = 0; i < checkpoints.Count; i++)
+        {
+            if (checkpoints[i].checkPointName.Equals(checkpoint))
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
     void saveGame()
     {
         Debug.Log(Application.persistentDataPath);
         //save game parameters -> must correspond to attributes in the GameData C# class
-        string curLevel = levelManager.GetCurrentLevelName();
+        string curLevel = SceneManager.GetActiveScene().name;
         string checkpointName = this.spawn.name;
 
 
         List<GameData> savedGames = loadSavedGamesList();
         //get existing loadfiles to update them by overwrite a save, or adding a savefile;
+        int savedGameIndex = findWithAttr(savedGames, checkpointName);
 
+        if (savedGameIndex != -1)
+        {
+            return;
+        }
         GameData to_save = new GameData(curLevel, checkpointName); // must correspond to attributes in the GameData C# class
         if (savedGames.Count < 3)
         {
@@ -575,6 +591,7 @@ public class PlayerController : MonoBehaviour
     private void AskContinue()
     {         continueText.text = "PRESS 'R' TO RESTART OR ENTER TO CONTINUE";         if (Input.GetKeyDown("r"))         {             levelManager.RestartLevel();         }         else if (Input.GetKeyDown(KeyCode.Return))         {
             // Takes the user to the next level.
+            StaticCheckpoint.spawn_point = "";
             levelManager.LoadNextLevel();         }      }
 
     private void WinGame()

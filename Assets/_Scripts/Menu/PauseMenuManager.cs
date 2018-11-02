@@ -87,23 +87,22 @@ public class PauseMenuManager : MenuManager
 
             this.resetIndex();
             this.pauseMenu.SetActive(false);
+            
             Time.timeScale = 1;
             GameData to_load = savedGames[savedGames.Count - 1];
+            foreach (GameData data in savedGames) {
+                print(data.checkPointName);
+            }
+            if (SceneManager.GetActiveScene().name != to_load.levelName)
+                return;
             StaticCheckpoint.spawn_point = to_load.checkPointName;
             SceneManager.LoadScene(to_load.levelName);
-
-
         }
     }
     public void onLoad()
     {
-        //this.pauseMenu.SetActive(false);
-        //  GameObject pauseObject = GameObject.Find("Menus");
-        //    pauseObject.GetComponent<PauseLoadMenuManager>().enabled = true;
-        //this.loadMenu.SetActive(true);
         this.resetIndex();
         loadSaveGame();
-        //   enabled = false;
     }
     public void Quit()
     {

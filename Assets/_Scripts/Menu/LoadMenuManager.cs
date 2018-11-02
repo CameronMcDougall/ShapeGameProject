@@ -52,16 +52,13 @@ public class LoadMenuManager : MenuManager
             FileStream f = File.Open(Application.persistentDataPath + "/" + file.Name, FileMode.OpenOrCreate);
             List<GameData> savedGames = (List<GameData>)bf.Deserialize(f);
             f.Close();
-
-            //Queue < GameData > savedGames = tempQueue.savesQueue;
-
             GameData to_load = savedGames[0];
             this.createButton(to_load.levelName, to_load.timestamp, transform);
             this.loadButtons[this.loadButtons.Count -1 ].GetComponent<RectTransform>().position += new Vector3(0,yOffset,0);
             this.loadActions.Add(()=> loadSaveGame(file.Name));
             yOffset -= loadButtons[this.loadButtons.Count - 1].GetComponent<RectTransform>().rect.height + 5;
+            this.loadButtons[this.loadButtons.Count - 1].GetComponentInChildren<Text>().fontSize = 12;
         }
-        print(transform.position);
         this.createButton("Back", "", transform);
         this.loadButtons[this.loadButtons.Count - 1].GetComponent<RectTransform>().position += new Vector3(0, yOffset, 0);
         this.loadButtons[this.loadButtons.Count - 1].GetComponentInChildren<Text>().fontSize = 14;
