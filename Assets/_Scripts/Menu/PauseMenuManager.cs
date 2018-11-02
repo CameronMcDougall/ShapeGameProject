@@ -7,6 +7,10 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 public class PauseMenuManager : MenuManager
 {
+    /* 
+    * Start Menu for Shape game; MDDN243/COMP313 course Project
+    * Cameron McDougall; mcdougcame@myvuw.ac.nz
+    */
     public List<Button> pauseButtons = new List<Button>();
     private List<Action> pauseActions;
     private bool isPaused = false;
@@ -24,7 +28,6 @@ public class PauseMenuManager : MenuManager
         base.setActions(this.pauseActions);
         base.setButtons(this.pauseButtons);
         base.setEscapeAction(this.escape);
-       
         this.fileNum = PlayerPrefs.GetInt("SaveFile");
     }
     void initButtons()
@@ -39,21 +42,17 @@ public class PauseMenuManager : MenuManager
         this.initEscapeAction();
         this.pauseActions.Add(() => Resume());
         this.pauseActions.Add(() => onLoad());
-       // this.pauseActions.Add(() => Resume());
         this.pauseActions.Add(() => Quit());
     }
 
     void initEscapeAction()
     {
-
         this.escape = (() => onPressedEscape());
-
     }
 
     public void onPressedEscape()
     {
-      // if (!this.loadMenu.activeInHierarchy)
-        // {
+        //in pause state or not escape handling
         this.isPaused = !this.isPaused;
         if (isPaused)
         {
@@ -65,7 +64,6 @@ public class PauseMenuManager : MenuManager
             this.Resume();
         }
         this.resetIndex();
-    //    }
     }
     public void Resume()
     {
@@ -74,7 +72,6 @@ public class PauseMenuManager : MenuManager
     }
     void loadSaveGame()
     {
-        print(Application.persistentDataPath);
         if (File.Exists(Application.persistentDataPath + "/autosave" + fileNum + ".dat"))
         {
             //getting the list of saved games and closing the fileOpener
@@ -82,17 +79,11 @@ public class PauseMenuManager : MenuManager
             FileStream file = File.Open(Application.persistentDataPath + "/autosave" + fileNum + ".dat", FileMode.OpenOrCreate);
             List<GameData> savedGames = (List<GameData>)bf.Deserialize(file);
             file.Close();
-
-            //Queue < GameData > savedGames = tempQueue.savesQueue;
-
             this.resetIndex();
             this.pauseMenu.SetActive(false);
-            
             Time.timeScale = 1;
+            //gets the latest checkpoint
             GameData to_load = savedGames[savedGames.Count - 1];
-            foreach (GameData data in savedGames) {
-                print(data.checkPointName);
-            }
             if (SceneManager.GetActiveScene().name != to_load.levelName)
                 return;
             StaticCheckpoint.spawn_point = to_load.checkPointName;

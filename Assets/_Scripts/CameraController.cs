@@ -59,12 +59,10 @@ public class CameraController : MonoBehaviour {
 	void FixedUpdate () {
         float x = Input.GetAxis("Mouse X") * mouseSensitivityX;
         float y = Input.GetAxis("Mouse Y") * mouseSensitivityY;
-        
         if (invert)
         {
             y = -y;
         }
-
         transform.rotation *= Quaternion.Euler(new Vector3(-y, x));
         if (transform.rotation.eulerAngles.x > 90f) {
             //camera does not go under plane

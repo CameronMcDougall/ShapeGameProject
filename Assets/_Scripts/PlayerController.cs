@@ -124,6 +124,7 @@ public class PlayerController : MonoBehaviour
             GameObject to_find = GameObject.Find(StaticCheckpoint.spawn_point);
             if (to_find != null) {
                 spawn.transform.position = to_find.transform.position;
+                this.spawn = to_find.gameObject;
                 Debug.Log("found a savegame!: checkpoint: " + StaticCheckpoint.spawn_point);
             }
         }    
@@ -149,13 +150,10 @@ public class PlayerController : MonoBehaviour
         if (!levelWon) {
             float deltaT = Time.deltaTime;
             shrinkDelay -= deltaT;
-            //Debug.Log (1 / 4);
             rayCastGround(getLowestVertex());
             updateShape();
             movementLogic();
             updateTimer();
-
-            //Debug.Log ("Grounded: " + grounded);
         }
         else if (levelWon)
         {
@@ -459,7 +457,6 @@ public class PlayerController : MonoBehaviour
     {
         if (other.CompareTag("KillBox") && !levelWon)
         {
-            Debug.Log("Touching killbox");
             transform.position = spawn.transform.position;
             rb.velocity = new Vector3(0.0f, 0.0f, 0.0f);
             rb.angularVelocity = new Vector3(0.0f, 0.0f, 0.0f);
@@ -499,23 +496,35 @@ public class PlayerController : MonoBehaviour
         }
         return -1;
     }
+    List<GameData> getCorrectLevel(List<GameData> data) {
+        //only access savepoint in same scene
+        List<GameData> temp = new List<GameData>();
+        foreach (GameData gameData in data) {
+            if (gameData.levelName == SceneManager.GetActiveScene().name) {
+                temp.Add(gameData);
+            }
+        }
+        return temp;
+    }
     void saveGame()
     {
-        Debug.Log(Application.persistentDataPath);
         //save game parameters -> must correspond to attributes in the GameData C# class
         string curLevel = SceneManager.GetActiveScene().name;
         string checkpointName = this.spawn.name;
-
-
-        List<GameData> savedGames = loadSavedGamesList();
         //get existing loadfiles to update them by overwrite a save, or adding a savefile;
+        List<GameData> savedGames = loadSavedGamesList();
+       //checks if checkpoint already exists
+        
+        //Creates no duplicates
         int savedGameIndex = findWithAttr(savedGames, checkpointName);
-
         if (savedGameIndex != -1)
         {
             return;
         }
+        //removes all saves from last level
+        savedGames = getCorrectLevel(savedGames);
         GameData to_save = new GameData(curLevel, checkpointName); // must correspond to attributes in the GameData C# class
+        
         if (savedGames.Count < 3)
         {
             savedGames.Add(to_save);
@@ -545,21 +554,18 @@ public class PlayerController : MonoBehaviour
 
     private List<GameData> loadSavedGamesList()
     {
-        if (File.Exists(Application.persistentDataPath + "/autosave" + fileNum + ".dat"))
+        string fileName = "autosave" + fileNum + ".dat";
+        if (File.Exists(Application.persistentDataPath +"/"+fileName))
         {
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream loadFile = File.Open(Application.persistentDataPath + "/autosave" + fileNum + ".dat", FileMode.OpenOrCreate);
-            object tempQueue = bf.Deserialize(loadFile);
-            Debug.Log("1 " + tempQueue.GetType().FullName);
-
-            List<GameData> test = tempQueue as List<GameData>;
-            Debug.Log("2 " + test);
-
+            FileStream file = File.Open(Application.persistentDataPath + "/" + fileName, FileMode.OpenOrCreate);
+            List<GameData> savedGames = (List<GameData>)bf.Deserialize(file);
+            file.Close();
             //QueueGamedata test2 = (QueueGamedata)tempQueue;
             //Debug.Log("3 " + test2);
-            loadFile.Close();
+            //file.Close();
 
-            List<GameData> result = test;
+            List<GameData> result = savedGames;
 
             return result;
         }
