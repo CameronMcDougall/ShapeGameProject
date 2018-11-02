@@ -56,7 +56,7 @@ public class CameraController : MonoBehaviour {
 		camDist = offset.magnitude;
 	}
 		
-	void Update () {
+	void FixedUpdate () {
         float x = Input.GetAxis("Mouse X") * mouseSensitivityX;
         float y = Input.GetAxis("Mouse Y") * mouseSensitivityY;
         
@@ -65,18 +65,6 @@ public class CameraController : MonoBehaviour {
             y = -y;
         }
 
-       /* float distance = 3f;
-        float distanceOffset = 0f; 
-        var delta = transform.position - (cameraPointer.transform.position);
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, delta, out hit, distance + 0.5f)) {
-            distanceOffset = distance - hit.distance + 0.8f;
-            distanceOffset = Mathf.Clamp(distanceOffset, 0, distance);
-        }
-
-        distance -= Input.GetAxis("ScrollWheel") * zoomSensitivity;
-        Mathf.Clamp(distance, 1, 6);*/
-        
         transform.rotation *= Quaternion.Euler(new Vector3(-y, x));
         if (transform.rotation.eulerAngles.x > 90f) {
             //camera does not go under plane
@@ -84,7 +72,16 @@ public class CameraController : MonoBehaviour {
         }
 
         transform.Rotate(0, 0, -transform.eulerAngles.z);
+        var pointer = player.transform;
 
-		transform.position = player.transform.position - transform.forward * camDist;
+		Vector3 desiredPosition = pointer.position - transform.forward * camDist;
+        transform.position = desiredPosition;
+
+        RaycastHit[] hits = Physics.RaycastAll(desiredPosition, pointer.position - desiredPosition, (pointer.position - desiredPosition).magnitude);
+        if (hits.Length != 1)
+        {
+            RaycastHit end = hits[hits.Length - 1];
+            transform.position = (end.point - pointer.position) * 0.8f + pointer.position;
+        }
 	}
 }
