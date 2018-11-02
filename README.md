@@ -1,9 +1,14 @@
 # Shapes
-
 ## General Overview:
 Shapes is a puzzle-platformer that focuses on player character morphing. Unlike most games, the player changes character during gameplay, and frequently, to complete the levels. The levels are a series of linear obstacle-based puzzles which require the player to use both the active and passive abilities of the various geometric characters, in order to complete the puzzles set before them.
+## installation
+Open the ShapesGame.exe file and choose your video settings. The menu will load and you can start playing the game.
+## Video Demonstration
+[Video Link](https://www.youtube.com/watch?v=2lXCOFFgSdI&feature=youtu.be)
+## How to play:
+use WASD keys to move, SPACEBAR to use special ability. ESC to pause, number keys starting from 1 depending on what characters you have level you are on.
 ## Characters:
-There are three main characters which the player can choose from. These are the Sphere, the Cube, and the Cylinder. More characters have been brainstormed but are yet to be finalized. Their passive and active abilities are as follows:
+There are three main characters which the player can choose from. These are the Sphere, the Cube, and the Cylinder. A character is unlocked for every new level. Their passive and active abilities are as follows:
 
 **The Sphere**\
 Active abilities:
