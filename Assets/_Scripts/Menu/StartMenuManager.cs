@@ -44,6 +44,7 @@ public class StartMenuManager : MenuManager {
     {
         PlayerPrefs.SetInt("SaveFile", findLastFile());
         SceneManager.LoadScene("Level_1");
+        StaticCheckpoint.spawn_point = "";
     }
     void onLoad()
     {

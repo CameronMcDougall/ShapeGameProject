@@ -33,21 +33,7 @@ public class LoadMenuManager : MenuManager
         loadButtons.Add(but);
     }
    
-    void getSaveFiles()
-    {
-        if (File.Exists(Application.persistentDataPath + "/autosave.dat"))
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream loadFile = File.Open(Application.persistentDataPath + "/autosave.dat", FileMode.OpenOrCreate);
-            object tempQueue = bf.Deserialize(loadFile);
-            List<GameData> test = tempQueue as List<GameData>;
-            loadFile.Close();
-            this.savedGames = test;
-            print(savedGames.Count);
-        }
-
-
-    }
+   
 
     void initEscape()
     {
@@ -92,14 +78,13 @@ public class LoadMenuManager : MenuManager
             FileStream file = File.Open(Application.persistentDataPath + "/" + fileName, FileMode.OpenOrCreate);
             List<GameData> savedGames = (List<GameData>)bf.Deserialize(file);
             file.Close();
-
             //Queue < GameData > savedGames = tempQueue.savesQueue;
             string temp = fileName;
             temp = temp.Replace("autosave","");
             temp = temp.Replace(".dat", "");
             int saveFileNum = (temp != "") ? Int32.Parse(temp): 1;
             PlayerPrefs.SetInt("SaveFile", saveFileNum);
-            GameData to_load = savedGames[0];
+            GameData to_load = savedGames[savedGames.Count-1];
             StaticCheckpoint.spawn_point = to_load.checkPointName;
             SceneManager.LoadScene(to_load.levelName);
 

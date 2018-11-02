@@ -43,6 +43,9 @@ public class MenuManager : MonoBehaviour {
             }  
         }
     }
+    public void resetIndex() {
+        this.currentSelection = 0;
+    }
     private void Update()
     {
 

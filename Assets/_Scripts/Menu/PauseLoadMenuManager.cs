@@ -8,109 +8,125 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 public class PauseLoadMenuManager : MenuManager {
 
-    public List<Button> loadButtons;
+    private List<Button> loadButtons;
     private List<Action> loadActions;
     private List<GameData> savedGames;
     private Action escape;
+    private int fileNum;
+    public GameObject buttonPref;
+    public GameObject checkpointMenu;
+    public GameObject pauseMenu;
+    private float time;
     void Start()
     {
-        this.initActions();
+        base.setMenuObject(this.checkpointMenu);
+        this.checkpointMenu.SetActive(false);
+        this.fileNum = PlayerPrefs.GetInt("SaveFile");
         this.initButtons();
         base.setActions(this.loadActions);
         base.setButtons(this.loadButtons);
         base.setEscapeAction(escape);
-        base.setMenuObject(this.gameObject);
+        this.enabled = false;
     }
     void initButtons()
     {
-        this.loadButtons[0].onClick.AddListener(delegate { loadSaveGame(0); });
-        this.loadButtons[1].onClick.AddListener(delegate { loadSaveGame(1); });
-        this.loadButtons[2].onClick.AddListener(delegate { loadSaveGame(2); });
-        this.loadButtons[3].onClick.AddListener(onBack);
-
+        this.loadButtons = new List<Button>();
+        this.loadActions = new List<Action>();
         //gets and print save files to buttons
-
         this.getSaveFiles();
+        float yOffset = 40;
         if (savedGames != null)
-        {
-            print(savedGames.Count);
+        { 
+            Transform transform = this.transform;
+            transform.position += new Vector3(0, 40, 0);
             for (int i = 0; i < savedGames.Count; i++)
             {
                 GameData data = savedGames[i];
-                this.loadButtons[i].GetComponentInChildren<Text>().text =
-                    data.levelName + " | " + data.checkPointName;
-            }
+                print(data.checkPointName);
+                this.createButton(data.levelName + " | " + data.checkPointName, transform);
+                this.loadButtons[i].GetComponent<RectTransform>().position += new Vector3(0, yOffset, 0);
+                yOffset -= loadButtons[i].GetComponent<RectTransform>().rect.height + 5;
+                this.loadActions.Add(() => onLoadAction(i));
+            }  
         }
+        this.createButton("Back", transform);
+        this.loadButtons[this.loadButtons.Count - 1].GetComponent<RectTransform>().position += new Vector3(0, yOffset, 0);
+        this.loadButtons[this.loadButtons.Count - 1].GetComponentInChildren<Text>().fontSize = 14;
+        this.loadActions.Add(() => onBack());
+        this.initEscape();
+    }
+    private void OnEnable()
+    {
+        print("enabled");
+        time = Time.unscaledTime;
 
     }
-
+    void onLoadAction(int num) {
+       loadSaveGame(num); 
+    }
     void getSaveFiles()
     {
-        if (File.Exists(Application.persistentDataPath + "/autosave.dat"))
+        if (File.Exists(Application.persistentDataPath + "/autosave" +this.fileNum+ ".dat"))
         {
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream loadFile = File.Open(Application.persistentDataPath + "/autosave.dat", FileMode.OpenOrCreate);
+            FileStream loadFile = File.Open(Application.persistentDataPath + "/autosave" + this.fileNum + ".dat", FileMode.OpenOrCreate);
             object tempQueue = bf.Deserialize(loadFile);
             List<GameData> test = tempQueue as List<GameData>;
             loadFile.Close();
             this.savedGames = test;
-            print(savedGames.Count);
         }
 
 
     }
-
-    void initActions()
+    void createButton(string text, Transform pos)
     {
-        this.loadActions = new List<Action>();
-        this.initEscape();
-        this.loadActions.Add(() => loadSaveGame(0));
-        this.loadActions.Add(() => loadSaveGame(1));
-        this.loadActions.Add(() => loadSaveGame(2));
-        this.loadActions.Add(() => onBack());
+        GameObject button = Instantiate(buttonPref, pos);
+        button.transform.parent = this.checkpointMenu.transform;
+        Button but = button.GetComponent<Button>();
+        but.GetComponentInChildren<Text>().text = text;
+        loadButtons.Add(but);
     }
 
     void initEscape()
     {
         this.escape = () => onBack();
     }
-    private int smallestAvaiableSave()
-    {
-        DirectoryInfo d = new DirectoryInfo(@Application.persistentDataPath);//Assuming Test is your Folder
-        FileInfo[] Files = d.GetFiles("*.txt"); //Getting Text files
-        string str = "";
-        foreach (FileInfo file in Files)
-        {
-            str = str + ", " + file.Name;
-        }
-
-        return 0;
-    }
-
+   
     void loadSaveGame(int num)
     {
-        if (File.Exists(Application.persistentDataPath + "/autosave.dat"))
+        if (File.Exists(Application.persistentDataPath + "/autosave"+fileNum+".dat"))
         {
             //getting the list of saved games and closing the fileOpener
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(Application.persistentDataPath + "/autosave.dat", FileMode.OpenOrCreate);
+            FileStream file = File.Open(Application.persistentDataPath + "/autosave"+fileNum+".dat", FileMode.OpenOrCreate);
             List<GameData> savedGames = (List<GameData>)bf.Deserialize(file);
             file.Close();
 
             //Queue < GameData > savedGames = tempQueue.savesQueue;
             if (num <= savedGames.Count - 1)
             {
+                this.resetIndex();
+                this.checkpointMenu.SetActive(false);
+                Time.timeScale = 1;
                 GameData to_load = savedGames[num];
                 StaticCheckpoint.spawn_point = to_load.checkPointName;
                 SceneManager.LoadScene(to_load.levelName);
+                
             }
         }
     }
 
-
     void onBack()
     {
-        SceneManager.LoadScene("StartMenu");
+        if (this.checkpointMenu.activeInHierarchy) {
+            this.checkpointMenu.SetActive(false);
+            GameObject pauseObject = GameObject.Find("Menus");
+          
+            this.pauseMenu.SetActive(true);
+            pauseObject.GetComponent<PauseMenuManager>().enabled = true;
+            this.resetIndex();
+            this.GetComponent<PauseLoadMenuManager>().enabled = false;
+        }  
     }
 
 
