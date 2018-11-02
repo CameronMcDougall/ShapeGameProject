@@ -80,8 +80,21 @@ public class CameraController : MonoBehaviour {
         RaycastHit[] hits = Physics.RaycastAll(desiredPosition, pointer.position - desiredPosition, (pointer.position - desiredPosition).magnitude);
 		if (hits.Length != 1 /*&& hits.collider.CompareTag("Spawn")==false*/)
         {
-			RaycastHit end = hits[hits.Length - 2];
-		
+            if (hits.Length == 2 && hits[0].collider.CompareTag("Respawn"))
+            {
+                return;
+            }
+            int index = hits.Length - 2;
+			RaycastHit end = hits[index];
+		    while (end.collider.CompareTag("Respawn"))
+            {
+                if (index - 1 < 0)
+                {
+                    return;
+                }
+                end = hits[index - 1];
+                index = index - 1;
+            }
 			//RaycastHit end = hits[0];
             transform.position = (end.point - pointer.position) * 0.8f + pointer.position;
 
