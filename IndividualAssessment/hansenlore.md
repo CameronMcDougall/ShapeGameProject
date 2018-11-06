@@ -34,7 +34,7 @@ Other features of code I contributed to are:
 
 - Description and link to the most interesting part of code written by me:
 
-There are a few pieces of code that contend for the most interesting part of code, but having to only choose one, I would choose the code for the spinning top, in particular the part where I alter its rigidbody constraints in order to make it be able to spin and move properly.
+There are a few pieces of code that contend for the most interesting part of code, but having to only choose one, I would choose the code for the spinning top, in particular the part where I alter its rigidbody constraints in order to make it be able to spin and move properly. (I am not sure why the code is all on one line, but it's the part of the line about rb.constraints = FreezeRotation etc.
 
 https://github.com/CameronMcDougall/ShapeGameProject/blob/f9f9d91eab922e85b1e23f7be166551bcaf59908/Assets/_Scripts/PlayerController.cs#L285
 
