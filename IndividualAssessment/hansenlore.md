@@ -1,4 +1,5 @@
 Header Information:
+
 Name: Lorens (Leo) Hansen
 Username: hansenlore
 Animal: Puppy
@@ -29,7 +30,9 @@ Important other parts:
 Other features of code I contributed to are:
 
 •	Cylinder boosting (fixing the direction and speed of the boost) Input level = TOUCHED
+
 •	Changing the rigid-body collision detection to continuous when a cylinder object is used so it cannot boost through the walls. Input level = TOUCHED
+
 •	Fixing the variable jumping height of the sphere so it now jumps at the same height every time. Input level = MOST (I moved actionLogic to be called in fixed update and wrote a few extra lines of code where sphere jumping was done to fix this).
 
 - Description and link to the most interesting part of code written by me:
