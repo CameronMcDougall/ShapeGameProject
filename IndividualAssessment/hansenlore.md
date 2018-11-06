@@ -36,11 +36,11 @@ Other features of code I contributed to are:
 
 There are a few pieces of code that contend for the most interesting part of code, but having to only choose one, I would choose the code for the spinning top, in particular the part where I alter its rigidbody constraints in order to make it be able to spin and move properly.
 
-(Image / link here)
+Line 314 in PlayerController.cs
 
 Since the spinning top cannot be accessed in the final game, here is an interesting part of code that can be seen in the final product.
 
-(Image / link here)
+Line 773 in PlayerController.cs
 
 This is the code I wrote in to handle removing text after a certain amount of time has passed. When first looking at this, I did not know any means of how this could be possible, but after researching, I found it was necessary to start a coroutine when calling the method to deactivate text so pausing deactivation would not affect the rest of the elements in the game, but rather solely affect the attempt text that I passed in.
 
@@ -49,7 +49,7 @@ This is the code I wrote in to handle removing text after a certain amount of ti
 
 The section of code I’m most proud of is the cylinder boosting bug fix. This was a major issue with our game where the cylinder would not boost in the direction the player was facing with the camera, but rather in one global direction at first. So one would not be able to beat level 2 and progress through the game. This was altered by another member of the group but now had the issue that the cylinder would only launch in the direction the top face was facing, which still wasn’t what we intended. The first part I fixed was to change the ‘transform.up’ code  to state ‘cam.transform.up’. This allowed the cylinder to move in the direction the camera was facing. However, the cylinder still boosted too far upwards and not far enough forwards. I experimented with some different values to multiply each of the directions by and the overall boost value in the public inspector to get the correct amount of boost to clear the gaps in level 2 and the gap in level 3.
 
-(Image of code)
+Line 251 in PlayerController.cs
 
 Learning Reflection:
 
@@ -61,4 +61,4 @@ In the technical side of things, I have learnt much more about how to use and mo
 
 - Description of the most important thing I will use from this project in future projects:
 
-The most important part of this project I will use in the future is the overall collaboration between team members, especially with those in another course, to produce a working game.
+The most important part of this project I will use in the future is the use of Github for overall collaboration between team members with different sets of skills to produce a working game.
