@@ -28,28 +28,28 @@ I did not design the spinning top nor the animations of spinning / starting up. 
 Important other parts:
 Other features of code I contributed to are:
 
-	•	Cylinder boosting (fixing the direction and speed of the boost) Input level = TOUCHED
-	•	Changing the rigid-body collision detection to continuous when a cylinder object is used so it cannot boost through the walls. Input level = TOUCHED
-	•	Fixing the variable jumping height of the sphere so it now jumps at the same height every time. Input level = MOST (I moved actionLogic to be called in fixed update and wrote a few extra lines of code where sphere jumping was done to fix this).
+•	Cylinder boosting (fixing the direction and speed of the boost) Input level = TOUCHED
+•	Changing the rigid-body collision detection to continuous when a cylinder object is used so it cannot boost through the walls. Input level = TOUCHED
+•	Fixing the variable jumping height of the sphere so it now jumps at the same height every time. Input level = MOST (I moved actionLogic to be called in fixed update and wrote a few extra lines of code where sphere jumping was done to fix this).
 
 - Description and link to the most interesting part of code written by me:
 
 There are a few pieces of code that contend for the most interesting part of code, but having to only choose one, I would choose the code for the spinning top, in particular the part where I alter its rigidbody constraints in order to make it be able to spin and move properly.
 
-Line 314 in PlayerController.cs
+https://github.com/CameronMcDougall/ShapeGameProject/blob/f9f9d91eab922e85b1e23f7be166551bcaf59908/Assets/_Scripts/PlayerController.cs#L285
 
-Since the spinning top cannot be accessed in the final game, here is an interesting part of code that can be seen in the final product.
+Since the spinning top cannot be accessed in the final game, here is an interesting part of code that can be seen in the final product:
 
-Line 773 in PlayerController.cs
+https://github.com/CameronMcDougall/ShapeGameProject/blob/f9f9d91eab922e85b1e23f7be166551bcaf59908/Assets/_Scripts/PlayerController.cs#L676
 
-This is the code I wrote in to handle removing text after a certain amount of time has passed. When first looking at this, I did not know any means of how this could be possible, but after researching, I found it was necessary to start a coroutine when calling the method to deactivate text so pausing deactivation would not affect the rest of the elements in the game, but rather solely affect the attempt text that I passed in.
+This (above link) is the code I wrote in to handle removing text after a certain amount of time has passed. When first looking at this, I did not know any means of how this could be possible, but after researching, I found it was necessary to start a coroutine when calling the method to deactivate text so pausing deactivation would not affect the rest of the elements in the game, but rather solely affect the attempt text that I passed in.
 
 
 - Identification of section of code I am most proud of and why:
 
 The section of code I’m most proud of is the cylinder boosting bug fix. This was a major issue with our game where the cylinder would not boost in the direction the player was facing with the camera, but rather in one global direction at first. So one would not be able to beat level 2 and progress through the game. This was altered by another member of the group but now had the issue that the cylinder would only launch in the direction the top face was facing, which still wasn’t what we intended. The first part I fixed was to change the ‘transform.up’ code  to state ‘cam.transform.up’. This allowed the cylinder to move in the direction the camera was facing. However, the cylinder still boosted too far upwards and not far enough forwards. I experimented with some different values to multiply each of the directions by and the overall boost value in the public inspector to get the correct amount of boost to clear the gaps in level 2 and the gap in level 3.
 
-Line 251 in PlayerController.cs
+https://github.com/CameronMcDougall/ShapeGameProject/blob/f9f9d91eab922e85b1e23f7be166551bcaf59908/Assets/_Scripts/PlayerController.cs#L236
 
 Learning Reflection:
 
