@@ -15,5 +15,19 @@ While the data stored currently is very native and holds the bare necessity, mor
 
 ### Interesting code
 
-The most interesting part of my code in my opinion would be the the Awake() method inside [playerController](https://github.com/CameronMcDougall/ShapeGameProject/blob/master/Assets/_Scripts/PlayerController.cs#L121-L131)
+The most interesting part of my code in my opinion would be the the Awake() method inside [playerController](https://github.com/CameronMcDougall/ShapeGameProject/blob/master/Assets/_Scripts/PlayerController.cs#L121-L131) where prior to the execution of the start method, will override the spawn position of the player. As part of the loading function, it was tricky as the PlayerController script would have needed to access variables from the loadMenu script, which was in a completely different scenes. 
+
+Therefore I had to find some form of persistent data transfering between scenes, and researched and found that static classes or variables made in a script were persistent throughout the whole game, and i was able to make a workaround by assigning the chosen save-file that was being loaded, to a a static variable before transitioning scenes and upon a new scene, access the variable and assign it to the newly initialized playerController script (demonstrated in the GameData object and the PlayerController class on line 123 - 124).
+
+### Proud code
+I'm proud of the save and load functions in the PlayerController and LoadMenu respectively, as i had to research on different concepts such as how to create a new file in C#, and store data which can be loaded, which required 'serialization'. Furthermore to produce 1 autosave file which can be overwritten and actually store multiple save-datas, instead of having multiple physical 'files' on the computer was a cleaner solution that i was proud of, as it made the savefiles easier to sort in order of the most recent save.
+
+# reflection:
+
+### What I've learnt from this project
+Whilst I have had experience with using GitLab and working in an team-based Agile environment prior, it was still nonetheless good experience for developing in a team. However what was fully fresh for me was working with Designers for a game, where tasks were fully segregated and to coporate with each other with completely different skill sets to produce a good outcome. Also, experience with Unity and C# was also a highlight, as Unity is a powerful engine with vast amounts of features and enhanced skills with another C# will always be a good benefit.
+
+### Future project use
+Definitely the communication and task assignment when it comes to people of complete different skill sets on a team.
+
 
