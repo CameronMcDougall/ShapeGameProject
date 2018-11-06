@@ -8,8 +8,8 @@
 	- [Most] **Menu**: I did the MenuManager, PauseMenuManager, StartMenuManager classes which were used for the in-game and before the game has started menus. I worked on most of the LoadMenuManager, being that I needed some of the code from Quan Le that he implemented for loading in the PlayerController class to load game files.  
 	- [Some] **Saving And Loading**(PlayerController class): I implemented some code to stop the saving taking duplicate checkpoints as the checkpoints could be triggered more than once while on it previously. I also added in code that stopped saves from a previous level in the same game as it created bugs. (findWithAttr and getCorrectLevel functions)  
 	- [Some] **CameraController** : I fixed some code in the camera so it didn't go underneath the plane as it was annoying to the gameplay.  
-	- [touched] **PlayerController class** : I fixed some code in the PlayerController Class to stop the player from getting the cube ability for all characters when swapping.  
-**A description and link to the most interesting part of code written by you**
+	- [Touched] **PlayerController class** : I fixed some code in the PlayerController Class to stop the player from getting the cube ability for all characters when swapping.  
+**A description and link to the most interesting part of code written by you**  
 [Actions in parent class](https://github.com/CameronMcDougall/ShapeGameProject/blob/master/Assets/_Scripts/Menu/MenuManager.cs#L25-L42)
 [Actions in child class](https://github.com/CameronMcDougall/ShapeGameProject/blob/master/Assets/_Scripts/Menu/StartMenuManager.cs#L22-L39)
 I would say the most interesting part of my code was the use of the Actions class to make the menus reusable. The Action class allowed me to use functions in the parent class from the child class.  
