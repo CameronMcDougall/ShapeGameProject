@@ -10,8 +10,8 @@
 	- [Some] **CameraController** : I fixed some code in the camera so it didn't go underneath the plane as it was annoying to the gameplay.  
 	- [Touched] **PlayerController class** : I fixed some code in the PlayerController Class to stop the player from getting the cube ability for all characters when swapping.  
 **A description and link to the most interesting part of code written by you**  
-[Actions in parent class](https://github.com/CameronMcDougall/ShapeGameProject/blob/master/Assets/_Scripts/Menu/MenuManager.cs#L25-L42)
-[Actions in child class](https://github.com/CameronMcDougall/ShapeGameProject/blob/master/Assets/_Scripts/Menu/StartMenuManager.cs#L22-L39)
+[Actions in parent class](https://github.com/CameronMcDougall/ShapeGameProject/blob/master/Assets/_Scripts/Menu/MenuManager.cs#L25-L42)  
+[Actions in child class](https://github.com/CameronMcDougall/ShapeGameProject/blob/master/Assets/_Scripts/Menu/StartMenuManager.cs#L22-L39)  
 I would say the most interesting part of my code was the use of the Actions class to make the menus reusable. The Action class allowed me to use functions in the parent class from the child class.  
 **Identification of the section of code you are most proud of - and why you feel that this is particularly good code. (this could be the same as above)**  
 I'm proud of the MenuManager class as it uses polymorpism and a few things like Actions to make the class more reusable and that makes it less code overall for the menus. I feel the classes code is well structured as well as the functions are spread out nicely.  
@@ -20,5 +20,5 @@ I'm proud of the MenuManager class as it uses polymorpism and a few things like 
 I learn't how to work in a agile environment with a team. In previous courses, I never used issues or a scrum board before so it was a good experience learning how programming teams operate.
 I also learnt the importance of sprint planning as it helps planning out the issues needed in a timespan. I've also learnt how to deal with merge conflicts which I didn't have much experience with in the past.
 I also learnt that unity is very annoying with git as you could get merge conflicts but some files would be in bytecode being unable to fix those conflicts without downloading files.
-- **A description of the most important thing you will use from this project in future projects**
+- **A description of the most important thing you will use from this project in future projects**  
 I will definitely use the knowledge learnt from the agile methodology as I'm starting my graduate job at the end of this trimester. This would include my knowledge learnt of dealing with merge conflicts and planning scrum sprints to achieve project goals more effectively. Also linking commits to issues would also help figuring out what developers have already done in trying to fix a certain issues as I wouldn't have to look through a whole lot of commits. 
